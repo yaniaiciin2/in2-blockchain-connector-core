@@ -14,6 +14,9 @@ RUN if [ "$SKIP_TESTS" = "true" ]; then \
 
 # build image
 FROM openjdk:17-alpine
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+USER nonroot
 WORKDIR /app
 COPY --from=TEMP_BUILD /home/gradle/src/build/libs/*.jar /app/
 ENTRYPOINT ["java", "-jar", "/app/in2-blockchain-connector-0.0.1.jar"]
