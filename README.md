@@ -14,14 +14,14 @@ TODO: Guide users through getting your code up and running on their own system. 
      - Docker Compose 1.29.2
    
 2. Software profiles 
-   - Default configuration: this profile is only used to execute test during the CI/CD pipeline.
-   - Dev configuration: this profile is used to execute the application in a Docker container.
-   - Test configuration: this profile is used to execute the application in a pre-production environment.
-   - Production configuration: this profile is used to execute the application in a production environment.
+   - <b>*Default*</b>: this profile is only used to execute test during the CI/CD pipeline.
+   - <b>DEV</b>: this profile is used to execute the application in a Docker container.
+   - <b>TEST</b>: this profile is used to execute the application in a pre-production environment.
+   - <b>PROD</b>: this profile is used to execute the application in a production environment.
 
-3. Software dependencies 
-4. Latest releases 
-5. API references
+3. API references
+    - Swagger: http://localhost:8280/swagger-ui.html
+    - OpenAPI: http://localhost:8280/api-docs
 
 # Build and Test
 To build the project, run the following command: 
