@@ -1,20 +1,32 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+Blockchain Connector is one of the components used by the Access Node to interact between off-chain storage and on-chain 
+storage. It is a RESTful API that provides a set of endpoints to interact with the Context Broker and Blockchain. 
+
+It is built using Java 17, Spring Boot, and Gradle.
 
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+1. Installation process
+   - Prerequisites: 
+     - Java 17 
+     - Gradle 7.2
+     - Docker 20.10.8
+     - Docker Compose 1.29.2
+   
+2. Software profiles 
+   - Default configuration: this profile is only used to execute test during the CI/CD pipeline.
+   - Dev configuration: this profile is used to execute the application in a Docker container.
+   - Test configuration: this profile is used to execute the application in a pre-production environment.
+   - Production configuration: this profile is used to execute the application in a production environment.
+
+3. Software dependencies 
+4. Latest releases 
+5. API references
 
 # Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+To build the project, run the following command: 
+To test the project, run the following command:
+To build the Docker image, run the following command:
 
 # Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
