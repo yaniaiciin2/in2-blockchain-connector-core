@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.controller;
+package es.in2.dome.blockchain.connector.integration.contextbroker.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/notifications")
+@RequestMapping("/notifications")
 public class ContextBrokerNotificationController {
 
     @PostMapping

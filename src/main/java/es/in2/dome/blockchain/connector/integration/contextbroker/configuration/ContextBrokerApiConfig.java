@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.configuration;
+package es.in2.dome.blockchain.connector.integration.contextbroker.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

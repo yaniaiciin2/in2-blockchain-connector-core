@@ -1,6 +1,9 @@
 spring:
     application:
         name: Blockchain Connector
+    config:
+      import:
+        - classpath:context-broker.yml
     datasource:
         url: jdbc:h2:mem:dbtest
         driver-class-name: org.h2.Driver

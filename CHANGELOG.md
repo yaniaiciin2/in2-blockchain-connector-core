@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- New Context Broker subscription feature that retrieves configs from yaml file.
+- New Context Broker subscription feature that implements subscriptions to entities configured.
+- New Context Broker notification endpoint that receives all data subscriptions that match with the subscriptions types
+- New docker-compose to update the context-broker and the blockchain connector locally
+- New test for Context Broker domain classes
 
 ## [0.0.0] - 2023-07-20
 ### Added

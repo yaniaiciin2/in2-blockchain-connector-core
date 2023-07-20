@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.domain;
+package es.in2.dome.blockchain.connector.integration.contextbroker.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SubscriptionEntityDTO {
+public class SubscriptionEntity {
     @JsonProperty("type") private String type;
 }

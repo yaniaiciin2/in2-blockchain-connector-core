@@ -1,6 +1,6 @@
 # Context Broker configuration file
 api:
-  subscription-url: http://localhost:1026/ngsi-ld/v1/subscriptions
+  subscription-url: http://context-broker:1026/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
 subscription:
   name: "default"
   entities:
