@@ -23,11 +23,11 @@ variables:
   app-id: '67bad954-f7ce-4640-b435-27df49939334'
   password-or-cert: 'ub68Q~OhA0S4Xqfi3UltfuAQjJiwS2RChw8F_beB'
   tenant: 'd4080b69-4c2b-49e6-9c20-3789b47bf163'
-  imageRepository: 'blockchain-connector-service'
+  imageRepository: 'dome-blockchain-connector-api'
   azureSubscription: 'Entorno Cloud DOME DEV'
   dockerRegistryServiceConnection: 'ACR DEV'
   dockerfilePath: '$(System.DefaultWorkingDirectory)/Dockerfile'
-  volumeRepository: 'blockchain-connector-service'
+  volumeRepository: 'dome-blockchain-connector-api'
 
 pool:
   vmImage: ubuntu-latest
