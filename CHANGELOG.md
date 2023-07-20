@@ -6,15 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1] - 2023-07-17
+## [0.0.0] - 2023-07-20
 ### Added
 - Initial project structure (#414)
 - .gitignore (#414)
 - Dockerfile (#414)
-- Blockchain Event Entity (#414)
-### Changed
 - README.md (#415)
 - CHANGELOG.md (#416)
+- Azure Pipelines (#419)
 
 [unreleased]:
-[0.0.1]: https://dev.azure.com/in2Dome/DOME/_git/in2-dome-blockchain_connector?version=GTv0.0.1
+[0.0.0]: https://dev.azure.com/in2Dome/DOME/_git/in2-dome-blockchain_connector?version=GTv0.0.0
