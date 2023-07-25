@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New docker-compose to update the context-broker and the blockchain connector locally(#421)
 - New additional Spring Boot metadata file for Context Broker YAML configuration attributes(#421)
 - New test for Context Broker domain classes(#421)
-- New Subscription Service to implement subscription business logic.
+- New Subscription Service to implement subscription business logic. (#425)
 ### Change
-- Changed Context Broker Config to use Subs Service
+- Changed Context Broker Config to use Subs Service (#425)
 - Update README.md with new Context Broker information (#421)
 - Update CHANGELOG.md with new features
 
