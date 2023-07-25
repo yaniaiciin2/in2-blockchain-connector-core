@@ -2,15 +2,15 @@ version: "3.8"
 services:
 
   # Blockchain Connector
-  blockchain-connector:
-    container_name: blockchain-connector
-    image: blockchain-connector
-    environment:
-      - "SPRING_PROFILES_ACTIVE=dev"
-    ports:
-      - "8280:8280"
-    networks:
-      - local_net
+#  blockchain-connector:
+#    container_name: blockchain-connector
+#    image: blockchain-connector
+#    environment:
+#      - "SPRING_PROFILES_ACTIVE=dev"
+#    ports:
+#      - "8280:8280"
+#    networks:
+#      - local_net
 
   # Context Broker
   context-broker:
