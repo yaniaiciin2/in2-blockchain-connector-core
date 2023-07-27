@@ -1,5 +1,6 @@
 package es.in2.dome.blockchain.connector.integration.contextbroker.domain;
 
+import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

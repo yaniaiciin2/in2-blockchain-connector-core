@@ -1,6 +1,8 @@
 package es.in2.dome.blockchain.connector.integration.contextbroker.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.ContextBrokerSubscription;
+import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
