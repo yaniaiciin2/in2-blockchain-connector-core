@@ -10,6 +10,7 @@ import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionEntity;
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionNotification;
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionNotificationEndpoint;
+import es.in2.dome.blockchain.connector.integration.contextbroker.exception.SubscriptionNotFoundException;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.SubscriptionService;
 import es.in2.dome.blockchain.connector.utils.ApplicationUtils;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +50,19 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             createSubscription();
         } else if (!subscriptionComparisonResult) {
             log.debug("Subscription with new data");
-            String subscriptionId = subscriptionList.get(0).getId();
+            String subscriptionId = getExistingSubscriptionId(subscriptionList);
             updateSubscription(subscriptionId);
         } else {
             log.debug("Subscription does not have new data. No action required.");
         }
 
+    }
+
+    private String getExistingSubscriptionId(List<SubscriptionDTO> subscriptionList) {
+        return subscriptionList.stream()
+                .map(SubscriptionDTO::getId)
+                .findFirst()
+                .orElseThrow(() -> new SubscriptionNotFoundException("No existing subscription found"));
     }
 
 

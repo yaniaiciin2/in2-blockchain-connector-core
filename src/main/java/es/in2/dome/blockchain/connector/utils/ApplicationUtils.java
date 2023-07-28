@@ -65,7 +65,7 @@ public class ApplicationUtils {
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
         // Verify Response HttpStatus
-        checkPostResponse(response);
+        checkResponse(response);
     }
 
     public void patchRequest(String url, String requestBody) {
@@ -82,10 +82,10 @@ public class ApplicationUtils {
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
         // Verify Response HttpStatus
-        checkPostResponse(response);
+        checkResponse(response);
     }
 
-    private void checkPostResponse(CompletableFuture<HttpResponse<String>> response) {
+    private void checkResponse(CompletableFuture<HttpResponse<String>> response) {
         String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
         String body = response.thenApply(HttpResponse::body).join();
 
