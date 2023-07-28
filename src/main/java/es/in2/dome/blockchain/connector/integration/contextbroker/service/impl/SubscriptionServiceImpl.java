@@ -39,7 +39,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final ContextBrokerSubscriptionConfig contextBrokerSubscriptionProperties;
 
     @Profile("!default")
-    public void createSubscription() throws JsonProcessingException {
+    public void createDefaultSubscription() throws JsonProcessingException {
 
         List<SubscriptionEntity> entities = new ArrayList<>();
         contextBrokerSubscriptionProperties.getEntities().forEach(item -> entities.add(SubscriptionEntity.builder()
@@ -81,6 +81,5 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         log.debug("post response = {}", response.get().body());
     }
-
 
 }

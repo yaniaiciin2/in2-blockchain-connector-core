@@ -15,12 +15,10 @@ public class ContextBrokerConfig {
 
     private final SubscriptionService subscriptionService;
 
-
     @Bean
     @Profile("!default")
     public void setDefaultSubscriptions() throws JsonProcessingException {
-        subscriptionService.createSubscription();
-
+        subscriptionService.createDefaultSubscription();
     }
 
 }
