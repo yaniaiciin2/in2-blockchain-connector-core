@@ -13,6 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "api")
-public class ContextBrokerApiConfig {
+public class ContextBrokerConfigApi {
     private String subscriptionUrl;
 }

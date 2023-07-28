@@ -1,11 +1,9 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.domain;
+package es.in2.dome.blockchain.connector.integration.contextbroker.service;
 
-
-
-import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerApiConfig;
-import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerSubscriptionConfig;
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.dto.EntityDTO;
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.dto.SubscriptionDTO;
+import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigApi;
+import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigSubscription;
+import es.in2.dome.blockchain.connector.integration.contextbroker.domain.dto.EntityDTO;
+import es.in2.dome.blockchain.connector.integration.contextbroker.domain.dto.SubscriptionDTO;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.impl.SubscriptionServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,16 +13,18 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-
-class SubscriptionServiceTests {
+class SubscriptionServiceImplTests {
 
     @Mock
-    private ContextBrokerApiConfig contextBrokerProperties;
+    private ContextBrokerConfigApi contextBrokerProperties;
 
     @Mock
-    private ContextBrokerSubscriptionConfig contextBrokerSubscriptionProperties;
+    private ContextBrokerConfigSubscription contextBrokerSubscriptionProperties;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -81,6 +81,7 @@ class SubscriptionServiceTests {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testParseSubscriptionList() throws Exception {
         // Arrange
         String responseBody = """
@@ -99,9 +100,8 @@ class SubscriptionServiceTests {
 
         List<SubscriptionDTO> subscriptionDTOList = (List<SubscriptionDTO>) parseSubscriptionList.invoke(subscriptionService, responseBody);
 
-
-
         // Assert
         Assertions.assertEquals(6, subscriptionDTOList.size());
     }
+
 }

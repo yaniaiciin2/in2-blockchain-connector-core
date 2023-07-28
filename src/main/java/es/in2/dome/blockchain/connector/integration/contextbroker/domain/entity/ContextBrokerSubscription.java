@@ -1,7 +1,6 @@
 package es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.SubscriptionNotification;
 import lombok.*;
 
 import java.util.List;

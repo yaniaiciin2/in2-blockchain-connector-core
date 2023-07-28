@@ -1,6 +1,5 @@
 package es.in2.dome.blockchain.connector.integration.contextbroker.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,14 @@ public class ContextBrokerConfig {
 
     @Bean
     @Profile("!default")
-    public void setDefaultSubscriptions() throws JsonProcessingException {
-        subscriptionService.createDefaultSubscription();
+    public void setDefaultSubscriptions() {
+
+        try {
+            subscriptionService.createDefaultSubscription();
+        } catch (Exception e) {
+            log.error("Error creating default subscription", e);
+        }
+
     }
 
 }
