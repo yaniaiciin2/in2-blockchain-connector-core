@@ -1,10 +1,12 @@
 package es.in2.dome.blockchain.connector.integration.contextbroker.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigApi;
-import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigSubscription;
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.dto.EntityDTO;
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.dto.SubscriptionDTO;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.impl.SubscriptionServiceImpl;
+import es.in2.dome.blockchain.connector.utils.ApplicationUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,13 +20,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 class SubscriptionServiceImplTests {
 
     @Mock
     private ContextBrokerConfigApi contextBrokerProperties;
 
     @Mock
-    private ContextBrokerConfigSubscription contextBrokerSubscriptionProperties;
+    private ApplicationUtils applicationUtils;
 
     @InjectMocks
     private SubscriptionServiceImpl subscriptionService;
@@ -51,16 +56,16 @@ class SubscriptionServiceImplTests {
         list2.add(entity1Map1);
         list2.add(entity1Map2);
 
-        SubscriptionServiceImpl subscriptionService = new SubscriptionServiceImpl(contextBrokerProperties, contextBrokerSubscriptionProperties);
-
         // Act
-        Method compareEntityListsMethod = SubscriptionServiceImpl.class.getDeclaredMethod("compareEntityLists", List.class, List.class);
+        Method compareEntityListsMethod = subscriptionService.getClass().getDeclaredMethod("compareEntityLists", List.class, List.class);
         compareEntityListsMethod.setAccessible(true);
         boolean result = (boolean) compareEntityListsMethod.invoke(subscriptionService, list1, list2);
 
         // Assert
         Assertions.assertTrue(result);
     }
+
+
 
     @Test
     void testCompareEntities() throws Exception {
@@ -69,10 +74,9 @@ class SubscriptionServiceImplTests {
         Map<String, Object> entity2Map = new HashMap<>();
         entity2Map.put("type", "type1");
 
-        SubscriptionServiceImpl subscriptionService = new SubscriptionServiceImpl(contextBrokerProperties, contextBrokerSubscriptionProperties);
 
         // Act
-        Method compareEntitiesMethod = SubscriptionServiceImpl.class.getDeclaredMethod("compareEntities", EntityDTO.class, Map.class);
+        Method compareEntitiesMethod = subscriptionService.getClass().getDeclaredMethod("compareEntities", EntityDTO.class, Map.class);
         compareEntitiesMethod.setAccessible(true);
         boolean result = (boolean) compareEntitiesMethod.invoke(subscriptionService, entity1, entity2Map);
 
@@ -81,8 +85,7 @@ class SubscriptionServiceImplTests {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testParseSubscriptionList() throws Exception {
+    void testGetContextBrokerSubscriptions() throws Exception {
         // Arrange
         String responseBody = """
                 [{"id":"urn:ngsi-ld:Subscription:default1690282910700","type":"Subscription","entities":[{"type":"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/product"},{"type":"productSpecification"}],"status":"active","isActive":true,"notification":{"format":"normalized","endpoint":{"uri":"http://blockchain-connector:8280/notifications","accept":"application/json"},"status":"ok"}},
@@ -92,16 +95,32 @@ class SubscriptionServiceImplTests {
                 {"id":"urn:ngsi-ld:Subscription:default1690286750383","type":"Subscription","entities":[{"type":"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/product"},{"type":"productSpecification"}],"status":"paused","isActive":false,"notification":{"format":"normalized","endpoint":{"uri":"http://blockchain-connector:8280/notifications","accept":"application/json"},"status":"ok"}},
                 {"id":"urn:ngsi-ld:Subscription:default1690447667491","type":"Subscription","entities":[{"type":"https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/product"},{"type":"productSpecification"},{"type":"productOffering"}],"status":"paused","isActive":false,"notification":{"format":"normalized","endpoint":{"uri":"http://blockchain-connector:8280/notifications","accept":"application/json"},"status":"ok"}}]""";
 
+        // Mock del método getRequest para que devuelva el JSON de prueba
+        when(applicationUtils.getRequest(any())).thenReturn(responseBody);
 
-        SubscriptionServiceImpl subscriptionService = new SubscriptionServiceImpl(contextBrokerProperties, contextBrokerSubscriptionProperties);
+        when(contextBrokerProperties.getSubscriptionUrl()).thenReturn("https://example.com/subscriptions");
 
-        Method parseSubscriptionList = SubscriptionServiceImpl.class.getDeclaredMethod("parseSubscriptionList", String.class);
-        parseSubscriptionList.setAccessible(true);
-
-        List<SubscriptionDTO> subscriptionDTOList = (List<SubscriptionDTO>) parseSubscriptionList.invoke(subscriptionService, responseBody);
+        // Act
+        List<SubscriptionDTO> subscriptions;
+        subscriptions = invokeGetContextBrokerSubscriptions();
 
         // Assert
-        Assertions.assertEquals(6, subscriptionDTOList.size());
+        Assertions.assertEquals(6, subscriptions.size());
+        Assertions.assertEquals("urn:ngsi-ld:Subscription:default1690282910700", subscriptions.get(0).getId());
+        Assertions.assertEquals("Subscription", subscriptions.get(0).getType());
+        Assertions.assertEquals(2, subscriptions.get(0).getEntities().size());
     }
+
+    private List<SubscriptionDTO> invokeGetContextBrokerSubscriptions() throws Exception {
+        Method getContextBrokerSubscriptions = SubscriptionServiceImpl.class.getDeclaredMethod("getContextBrokerSubscriptions");
+        getContextBrokerSubscriptions.setAccessible(true);
+        String response = applicationUtils.getRequest(contextBrokerProperties.getSubscriptionUrl());
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response, new TypeReference<>() {
+        });
+    }
+
+
+
 
 }

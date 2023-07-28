@@ -14,10 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New additional Spring Boot metadata file for Context Broker YAML configuration attributes(#421)
 - New test for Context Broker domain classes(#421)
 - New Subscription Service to implement subscription business logic. (#425)
+- New DTOs for communication between the service and Orion Context Broker (#427)
+- New methods to communicate with Context Broker (#427)
+- New methods to build new subscriptions (#427)
 ### Change
 - Changed Context Broker Config to use Subs Service (#425)
 - Update README.md with new Context Broker information (#421)
 - Update CHANGELOG.md with new features
+- SubscriptionService now detects subscriptions before doing a new one (#427)
+- SubscriptionService now changes existing subscriptions when it detects one with different parameters (#427)
 
 ### Deleted
 - Delete Blockchain Event Entity because it is not used for now and has its own branch to be implemented in the future.

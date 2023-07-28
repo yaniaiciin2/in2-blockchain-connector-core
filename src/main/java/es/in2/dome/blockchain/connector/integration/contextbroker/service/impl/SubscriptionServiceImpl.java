@@ -19,11 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -36,7 +32,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final ApplicationUtils applicationUtils;
 
     @Profile("!default")
-    public void createDefaultSubscription() throws JsonProcessingException, InterruptedException, ExecutionException {
+    public void createDefaultSubscription() throws JsonProcessingException{
 
         log.debug("Creating default subscription...");
 
@@ -52,13 +48,30 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if(subscriptionList.isEmpty()) {
             createSubscription();
         } else if (!subscriptionComparisonResult) {
-            // update subscription adding new entities_type
+            log.debug("Subscription with new data");
+            String subscriptionId = subscriptionList.get(0).getId();
+            updateSubscription(subscriptionId);
         } else {
             log.debug("Subscription does not have new data. No action required.");
         }
 
     }
 
+
+
+    private void updateSubscription(String id) throws JsonProcessingException {
+        log.debug("Updating subscription...");
+
+        ContextBrokerSubscription updatedSubscription = buildSubscription();
+        updatedSubscription.setId(id);
+
+        String requestBody = new ObjectMapper().writeValueAsString(updatedSubscription);
+        log.debug("Updating subscription in Context Broker: {}", requestBody);
+
+        // Perform the PUT request to update the subscription
+        applicationUtils.patchRequest(contextBrokerProperties.getSubscriptionUrl() + "/" + id, requestBody);
+        log.debug("Subscription updated successfully");
+    }
     private void createSubscription() throws JsonProcessingException {
 
         log.debug("Building subscription...");

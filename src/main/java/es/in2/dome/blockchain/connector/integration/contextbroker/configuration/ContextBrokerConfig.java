@@ -22,6 +22,7 @@ public class ContextBrokerConfig {
             subscriptionService.createDefaultSubscription();
         } catch (Exception e) {
             log.error("Error creating default subscription", e);
+            Thread.currentThread().interrupt();
         }
 
     }
