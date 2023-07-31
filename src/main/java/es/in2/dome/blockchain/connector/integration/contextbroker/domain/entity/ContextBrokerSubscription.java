@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.domain;
+package es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -11,12 +11,22 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ContextBrokerSubscription {
-    @JsonProperty("entities")
-    private List<SubscriptionEntity> entities;
     @JsonProperty("id")
     private String id;
+
     @JsonProperty("type")
     private String type;
+
+    @JsonProperty("entities")
+    private List<SubscriptionEntity> entities;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("isActive")
+    private boolean isActive;
+
     @JsonProperty("notification")
     private SubscriptionNotification notification;
 }
+

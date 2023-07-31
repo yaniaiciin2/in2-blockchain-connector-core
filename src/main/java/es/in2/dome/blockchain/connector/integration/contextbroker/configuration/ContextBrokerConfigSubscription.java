@@ -16,7 +16,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "subscription")
-public class ContextBrokerSubscriptionConfig {
+public class ContextBrokerConfigSubscription {
     private List<Map<String, Object>> entities;
     private String name;
     private String idPrefix;
