@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New Context Broker subscription feature that retrieves configs from yaml file. (#421)
 - New Context Broker subscription feature that implements subscriptions to entities configured.(#421)
 - New Context Broker notification endpoint that receives all data subscriptions that match with the subscriptions types. (#421)
-- New Blockchain Connector feature that receives notification data and generates DOME Events with hashlinks
+- New Blockchain Connector feature that receives notification data and generates DOME Events with hashlinks (#442)
 - New docker-compose to update the context-broker and the blockchain connector locally (#421)
 - New additional Spring Boot metadata file for Context Broker YAML configuration attributes(#421)
 - New test for Context Broker domain classes (#421)

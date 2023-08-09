@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BlockchainEventDTO {
+public class DomeEventDTO {
 
     private String type;
     private String data;

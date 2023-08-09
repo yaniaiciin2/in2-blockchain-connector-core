@@ -3,13 +3,15 @@ package es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.List;
+
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BlockchainEventEntity {
+public class DomeEventEntity {
     @JsonProperty("type")
     private String type;
 
@@ -20,5 +22,5 @@ public class BlockchainEventEntity {
     private String timestamp;
 
     @JsonProperty("metadata")
-    private BlockchainEventEntityMetadata metadata;
+    private List<DomeEventEntityMetadata> metadata;
 }
