@@ -22,5 +22,5 @@ public class DomeEventEntity {
     private String timestamp;
 
     @JsonProperty("metadata")
-    private List<DomeEventEntityMetadata> metadata;
+    private List<String> metadata;
 }

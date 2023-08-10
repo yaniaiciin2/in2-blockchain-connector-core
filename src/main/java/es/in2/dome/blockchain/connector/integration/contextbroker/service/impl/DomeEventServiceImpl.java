@@ -2,6 +2,7 @@ package es.in2.dome.blockchain.connector.integration.contextbroker.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigApi;
 import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.DomeEventEntity;
 import es.in2.dome.blockchain.connector.integration.contextbroker.exception.HashLinkException;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.DomeEventService;
@@ -22,15 +23,17 @@ import java.util.ArrayList;
 public class DomeEventServiceImpl implements DomeEventService {
 
     private final ApplicationUtils applicationUtils;
+    private final ContextBrokerConfigApi contextBrokerProperties;
 
     @Override
-    public String createDomeEvent(String type, String notificationdata) throws JsonProcessingException, HashLinkException {
+    public String createDomeEvent(String type, String notificationdata, String id) throws JsonProcessingException, HashLinkException {
         String timestamp = generateTimestamp();
-        String dataHashLink = createHashLink(notificationdata);
+        String dataLocation = createHashLink(notificationdata, id);
+        log.debug("DataLocation: " +dataLocation);
 
         DomeEventEntity domeEventEntity = DomeEventEntity.builder()
                 .type(type)
-                .dataLocation(dataHashLink)
+                .dataLocation(dataLocation)
                 .timestamp(timestamp)
                 .metadata(new ArrayList<>())
                 .build();
@@ -48,10 +51,14 @@ public class DomeEventServiceImpl implements DomeEventService {
 
 
 
-    private String createHashLink(String resourceData) throws HashLinkException {
+    private String createHashLink(String resourceData, String id) throws HashLinkException {
         try {
             String resourceHash = applicationUtils.calculateSHA256Hash(resourceData);
-            return BlockchainConnectorUtils.HASHLINK_PREFIX + resourceHash;
+            return BlockchainConnectorUtils.HASHLINK_PREFIX +
+                    createEntitiesURL() +
+                    id +
+                    BlockchainConnectorUtils.HASHLINK_PARAMETER +
+                    resourceHash;
         } catch (NoSuchAlgorithmException e) {
             throw new HashLinkException("Error creating Hashlink");
         }
@@ -61,6 +68,13 @@ public class DomeEventServiceImpl implements DomeEventService {
     private String generateTimestamp() {
         LocalDateTime timestamp = LocalDateTime.now();
         return timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public String createEntitiesURL() {
+        String url = contextBrokerProperties.getSubscriptionUrl();
+
+        // Replace "/subscriptions" with "/entities"
+        return url.replace("/subscriptions", "/entities/");
     }
 
 
