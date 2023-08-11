@@ -6,6 +6,11 @@
       "description": "The URL to the subscription API."
     },
     {
+      "name": "api.entities-url",
+      "type": "java.lang.String",
+      "description": "The URL to OCB entities."
+    },
+    {
       "name": "subscription.name",
       "type": "java.lang.String",
       "description": "Subscription name used to build the subscription ID."

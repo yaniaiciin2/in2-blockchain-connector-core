@@ -54,8 +54,7 @@ public class DomeEventServiceImpl implements DomeEventService {
     private String createHashLink(String resourceData, String id) throws HashLinkException {
         try {
             String resourceHash = applicationUtils.calculateSHA256Hash(resourceData);
-            return BlockchainConnectorUtils.HASHLINK_PREFIX +
-                    createEntitiesURL() +
+            return contextBrokerProperties.getEntitiesUrl() +
                     id +
                     BlockchainConnectorUtils.HASHLINK_PARAMETER +
                     resourceHash;
@@ -68,13 +67,6 @@ public class DomeEventServiceImpl implements DomeEventService {
     private String generateTimestamp() {
         LocalDateTime timestamp = LocalDateTime.now();
         return timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    }
-
-    public String createEntitiesURL() {
-        String url = contextBrokerProperties.getSubscriptionUrl();
-
-        // Replace "/subscriptions" with "/entities"
-        return url.replace("/subscriptions", "/entities/");
     }
 
 

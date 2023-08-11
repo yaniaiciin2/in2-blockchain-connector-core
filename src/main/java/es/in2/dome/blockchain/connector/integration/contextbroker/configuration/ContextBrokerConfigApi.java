@@ -15,4 +15,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "api")
 public class ContextBrokerConfigApi {
     private String subscriptionUrl;
+    private String entitiesUrl;
 }
