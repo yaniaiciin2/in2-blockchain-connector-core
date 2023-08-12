@@ -44,7 +44,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         boolean subscriptionComparisonResult = subscriptionList.stream()
                 .anyMatch(subscription -> subscription.getType().equals(contextBrokerSubscriptionProperties.getType()) &&
                         subscription.getEntities().size() == contextBrokerSubscriptionProperties.getEntities().size() &&
-                        compareEntityLists(subscription.getEntities(), contextBrokerSubscriptionProperties.getEntities()));
+                        compareEntityLists(subscription.getEntities(), contextBrokerSubscriptionProperties.getEntities()) &&
+                        Objects.equals(subscription.getNotification().getEndpoint().getUri(), contextBrokerSubscriptionProperties.getNotificationEndpointUri()));
 
         if(subscriptionList.isEmpty()) {
             createSubscription();
@@ -72,6 +73,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         ContextBrokerSubscription updatedSubscription = buildSubscription();
         updatedSubscription.setId(id);
+        updatedSubscription.setActive(true);
 
         String requestBody = new ObjectMapper().writeValueAsString(updatedSubscription);
         log.debug("Updating subscription in Context Broker: {}", requestBody);
@@ -84,6 +86,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         log.debug("Building subscription...");
         ContextBrokerSubscription newSubscription = buildSubscription();
+        newSubscription.setActive(true);
 
         // Parse subscription to JSON String object.
         String requestBody = new ObjectMapper().writeValueAsString(newSubscription);
