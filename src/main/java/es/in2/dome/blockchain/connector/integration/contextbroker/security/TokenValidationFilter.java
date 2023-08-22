@@ -28,7 +28,7 @@ public class TokenValidationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String providedToken = httpRequest.getHeader("Authorization"); // Obtener el encabezado "Authorization"
+        String providedToken = httpRequest.getHeader("Authorization");
 
         log.debug("Provided Token: " + providedToken);
 
