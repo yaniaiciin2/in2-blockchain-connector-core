@@ -25,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
         try {
             JsonNode root = objectMapper.readTree(data);
             String type = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get("type").asText();
-            String id = extractField(data, BlockchainConnectorUtils.ID_FIELD);
+            String id = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get(BlockchainConnectorUtils.ID_FIELD).asText();
             log.debug("@type: " + type);
             log.debug("@id: " + id);
             JsonNode eventDataNode = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0);
