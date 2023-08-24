@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.dome.blockchain.connector.integration.contextbroker.exception.HashLinkException;
 import es.in2.dome.blockchain.connector.integration.contextbroker.exception.JsonReadingException;
 import es.in2.dome.blockchain.connector.integration.contextbroker.service.NotificationService;
+import es.in2.dome.blockchain.connector.utils.BlockchainConnectorUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,11 @@ public class NotificationServiceImpl implements NotificationService {
     public void processNotification(String data) {
         try {
             JsonNode root = objectMapper.readTree(data);
-            String type = root.get("data").get(0).get("type").asText();
-            String id = root.get("data").get(0).get("id").asText();
+            String type = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get("type").asText();
+            String id = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get(BlockchainConnectorUtils.ID_FIELD).asText();
             log.debug("@type: " + type);
             log.debug("@id: " + id);
+            JsonNode eventDataNode = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0);
 
             // Try to find a data class associated with the type
             Class<?> dataClass = findDataClass();
@@ -37,8 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
                 createDomeEvent(type, id, eventData);
             } else {
                 // Convert the remaining data to a JSON string
-                String restOfData = objectMapper.writeValueAsString(root);
-                log.debug("Rest of data: " + restOfData);
+                String restOfData = objectMapper.writeValueAsString(eventDataNode);
                 createDomeEvent(type, id, restOfData);
             }
         } catch (JsonProcessingException e) {
@@ -60,6 +61,14 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (HashLinkException e) {
             throw new HashLinkException("Error while creating hashlink", e);
         }
+    }
+
+
+
+    @Override
+    public String extractField(String body, String fieldName) throws JsonProcessingException {
+        JsonNode rootNode = objectMapper.readTree(body);
+        return rootNode.get(fieldName).asText();
     }
 }
 

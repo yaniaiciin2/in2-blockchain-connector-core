@@ -10,6 +10,7 @@ public class BlockchainConnectorUtils {
     private BlockchainConnectorUtils() {
 
     }
-    public static final String HASHLINK_PREFIX = "hl:";
     public static final String HASHLINK_PARAMETER = "?hl=";
+    public static final String DATA_FIELD = "data";
+    public static final String ID_FIELD = "id";
 }

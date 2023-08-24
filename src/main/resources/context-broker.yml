@@ -2,6 +2,7 @@
 api:
   subscription-url: http://context-broker:1026/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
   entities-url: http://context-broker:1026/ngsi-ld/v1/entities/
+  access-token: "example-token"
 subscription:
   name: "default"
   entities:
@@ -11,6 +12,7 @@ subscription:
       type: "ProductOrder"
     -
       type: "ProductOffering"
+
   id-prefix: "urn:ngsi-ld:Subscription:"
   type: "Subscription"
   notification-endpoint-uri: http://blockchain-connector:8280/notifications

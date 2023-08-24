@@ -1,6 +1,11 @@
 {
   "properties": [
     {
+      "name": "api.access-token",
+      "type": "java.lang.String",
+      "description": " Valid Access Token."
+    },
+    {
       "name": "api.subscription-url",
       "type": "java.lang.String",
       "description": "The URL to the subscription API."

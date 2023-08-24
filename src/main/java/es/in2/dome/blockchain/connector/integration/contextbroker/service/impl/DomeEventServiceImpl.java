@@ -41,9 +41,7 @@ public class DomeEventServiceImpl implements DomeEventService {
         // Create ObjectMapper to convert to JSON
         String blockchainEventJson = new ObjectMapper().writeValueAsString(domeEventEntity);
 
-
         log.debug("Blockchain Event JSON: " + blockchainEventJson);
-
 
         return blockchainEventJson;
 
@@ -62,6 +60,17 @@ public class DomeEventServiceImpl implements DomeEventService {
             throw new HashLinkException("Error creating Hashlink");
         }
     }
+
+    @Override
+    public String createHash(String resourceData, String id) throws HashLinkException {
+        try {
+            return applicationUtils.calculateSHA256Hash(resourceData);
+        } catch (NoSuchAlgorithmException e) {
+            throw new HashLinkException("Error creating Hashlink");
+        }
+    }
+
+
 
 
     private String generateTimestamp() {
