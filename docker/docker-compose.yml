@@ -2,41 +2,26 @@ version: "3.8"
 services:
 
   # Blockchain Connector
+  blockchain-connector-2:
+    container_name: blockchain-connector-2
+    image: blockchain-connector
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "3311:3310"
+    networks:
+      - local_net
+
   blockchain-connector:
     container_name: blockchain-connector
     image: blockchain-connector
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
-      - "8280:8280"
+      - "3310:3310"
     networks:
       - local_net
 
-  # Context Broker
-  context-broker:
-    container_name: context-broker
-    image: fiware/orion-ld:latest
-    command: "-dbhost context-broker-mongo"
-    ports:
-      - "1026:1026"
-    links:
-      - context-broker-mongo
-    networks:
-      - local_net
-
-  # Context Broker MongoDB
-  context-broker-mongo:
-    container_name: context-broker-mongo
-    image: mongo:4.4
-    command: "--nojournal"
-    volumes:
-      - CONTEXT_BROKER:/data/db
-      - CONTEXT_BROKER_DBCONFIG:/data/configdb
-    networks:
-      - local_net
 
 networks:
   local_net:
-volumes:
-  CONTEXT_BROKER:
-  CONTEXT_BROKER_DBCONFIG:

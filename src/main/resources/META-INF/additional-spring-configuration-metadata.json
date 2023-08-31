@@ -1,6 +1,7 @@
 {
   "properties": [
     {
+
       "name": "api.access-token",
       "type": "java.lang.String",
       "description": " Valid Access Token."
@@ -42,3 +43,4 @@
     }
   ]
 }
+

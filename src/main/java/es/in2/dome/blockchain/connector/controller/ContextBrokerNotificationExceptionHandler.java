@@ -1,8 +1,9 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.controller;
+package es.in2.dome.blockchain.connector.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import es.in2.dome.blockchain.connector.integration.contextbroker.exception.HashLinkException;
+import es.in2.dome.blockchain.connector.exception.HashLinkException;
+import es.in2.dome.blockchain.connector.exception.InvalidHashlinkComparisonException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,12 @@ public class ContextBrokerNotificationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException ex) {
         return ResponseEntity.badRequest().body("JSON Processing Exception");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleInvalidHashlinkComparisonException(InvalidHashlinkComparisonException ex) {
+        return ResponseEntity.badRequest().body("Invalid Hashlink Comparison Exception");
     }
 }
 

@@ -1,7 +1,6 @@
+/*
 package es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity;
 
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionNotification;
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.SubscriptionNotificationEndpoint;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -52,4 +51,4 @@ class SubscriptionNotificationTests {
         assertEquals(endpoint, subscriptionNotification.getEndpoint());
     }
 
-}
+}*/

@@ -1,13 +1,11 @@
 # Context Broker configuration file
 api:
-  subscription-url: http://context-broker:1026/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
-  entities-url: http://context-broker:1026/ngsi-ld/v1/entities/
+  subscription-url: http://sp-orionld:1027/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
+  entities-url: http://sp-orionld:1027/ngsi-ld/v1/entities/
   access-token: "example-token"
 subscription:
   name: "default"
   entities:
-    -
-      type: https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/product
     -
       type: "ProductOrder"
     -
@@ -15,4 +13,4 @@ subscription:
 
   id-prefix: "urn:ngsi-ld:Subscription:"
   type: "Subscription"
-  notification-endpoint-uri: http://blockchain-connector:8280/notifications
+  notification-endpoint-uri: http://sp-blockchain-connector-core:8082/notifications

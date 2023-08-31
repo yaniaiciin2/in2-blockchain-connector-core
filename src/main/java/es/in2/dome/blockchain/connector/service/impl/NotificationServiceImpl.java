@@ -1,11 +1,12 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.service.impl;
+package es.in2.dome.blockchain.connector.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.dome.blockchain.connector.integration.contextbroker.exception.HashLinkException;
-import es.in2.dome.blockchain.connector.integration.contextbroker.exception.JsonReadingException;
-import es.in2.dome.blockchain.connector.integration.contextbroker.service.NotificationService;
+import es.in2.dome.blockchain.connector.exception.HashLinkException;
+import es.in2.dome.blockchain.connector.exception.JsonReadingException;
+import es.in2.dome.blockchain.connector.service.HashLinkResolutionService;
+import es.in2.dome.blockchain.connector.service.NotificationService;
 import es.in2.dome.blockchain.connector.utils.BlockchainConnectorUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final DomeEventServiceImpl domeEventService;
     private final ObjectMapper objectMapper;
+    private final HashLinkResolutionService hashLinkResolutionService;
 
     @Override
     public void processNotification(String data) {
@@ -26,8 +28,6 @@ public class NotificationServiceImpl implements NotificationService {
             JsonNode root = objectMapper.readTree(data);
             String type = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get("type").asText();
             String id = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0).get(BlockchainConnectorUtils.ID_FIELD).asText();
-            log.debug("@type: " + type);
-            log.debug("@id: " + id);
             JsonNode eventDataNode = root.get(BlockchainConnectorUtils.DATA_FIELD).get(0);
 
             // Try to find a data class associated with the type
@@ -65,11 +65,38 @@ public class NotificationServiceImpl implements NotificationService {
 
 
 
-    @Override
-    public String extractField(String body, String fieldName) throws JsonProcessingException {
-        JsonNode rootNode = objectMapper.readTree(body);
-        return rootNode.get(fieldName).asText();
+
+
+
+    private String extractDataLocationValue(String body) throws JsonProcessingException {
+        try {
+            JsonNode rootNode = objectMapper.readTree(body);
+            JsonNode dataLocationNode = rootNode.get("data_location");
+
+            if (dataLocationNode != null) {
+                return dataLocationNode.asText();
+            } else {
+                log.error("Missing 'data_location' field in the JSON");
+            }
+        } catch (Exception e) {
+            log.error("Error extracting data_location value: " + e.getMessage());
+        }
+        return null;
     }
+
+    @Override
+    public void processEvent(String data) {
+        try {
+            String datalocation = extractDataLocationValue(data);
+            hashLinkResolutionService.resolveHashlink(datalocation);
+        } catch (JsonProcessingException e) {
+            throw new JsonReadingException("Error processing event notification", e);
+        }
+
+
+    }
+
+
 }
 
 
