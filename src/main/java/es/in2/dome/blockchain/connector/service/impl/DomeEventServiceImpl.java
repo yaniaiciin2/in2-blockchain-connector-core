@@ -1,11 +1,11 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.service.impl;
+package es.in2.dome.blockchain.connector.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigApi;
-import es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity.DomeEventEntity;
-import es.in2.dome.blockchain.connector.integration.contextbroker.exception.HashLinkException;
-import es.in2.dome.blockchain.connector.integration.contextbroker.service.DomeEventService;
+import es.in2.dome.blockchain.connector.configuration.ContextBrokerConfigApi;
+import es.in2.dome.blockchain.connector.domain.entity.DomeEventEntity;
+import es.in2.dome.blockchain.connector.exception.HashLinkException;
+import es.in2.dome.blockchain.connector.service.DomeEventService;
 import es.in2.dome.blockchain.connector.utils.ApplicationUtils;
 import es.in2.dome.blockchain.connector.utils.BlockchainConnectorUtils;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class DomeEventServiceImpl implements DomeEventService {
         log.debug("DataLocation: " +dataLocation);
 
         DomeEventEntity domeEventEntity = DomeEventEntity.builder()
-                .type(type)
+                .type(type + BlockchainConnectorUtils.EVENT_PREFIX)
                 .dataLocation(dataLocation)
                 .timestamp(timestamp)
                 .metadata(new ArrayList<>())
@@ -40,8 +40,9 @@ public class DomeEventServiceImpl implements DomeEventService {
 
         // Create ObjectMapper to convert to JSON
         String blockchainEventJson = new ObjectMapper().writeValueAsString(domeEventEntity);
+        log.debug(blockchainEventJson);
 
-        log.debug("Blockchain Event JSON: " + blockchainEventJson);
+        log.debug("DOME Event JSON: " + blockchainEventJson);
 
         return blockchainEventJson;
 

@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.domain.entity;
+package es.in2.dome.blockchain.connector.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class DomeEventEntity {
+
     @JsonProperty("type")
     private String type;
 

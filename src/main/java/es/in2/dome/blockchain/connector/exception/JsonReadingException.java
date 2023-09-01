@@ -1,4 +1,4 @@
-package es.in2.dome.blockchain.connector.integration.contextbroker.exception;
+package es.in2.dome.blockchain.connector.exception;
 
 public class JsonReadingException extends RuntimeException {
 

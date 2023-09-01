@@ -4,6 +4,7 @@ spring:
     config:
       import:
         - classpath:context-broker.yml
+        - file:/src/main/resources/context-broker.yml
     datasource:
         url: jdbc:h2:mem:dbtest
         driver-class-name: org.h2.Driver
@@ -54,9 +55,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 server:
-  port: 8280
+  port: 8080
 app:
   openapi:
-    dev-url: http://localhost:8280
+    dev-url: http://localhost:3311
     test-url: https://bkconntest.in2.es
     prod-url: https://bkconn.in2.es
