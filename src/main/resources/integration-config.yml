@@ -1,0 +1,32 @@
+# Integration configuration file
+
+api:
+  subscription-url: http://localhost:1026/ngsi-ld/v1/subscriptions #http://localhost:1026/ngsi-ld/v1/subscriptions
+  entities-url: http://localhost:1026/ngsi-ld/v1/entities
+  access-token: "example-token"
+subscription:
+  name: "default"
+  entities:
+    -
+      type: "ProductOrder"
+    -
+      type: "ProductOffering"
+
+  id-prefix: "urn:ngsi-ld:Subscription:"
+  type: "Subscription"
+  notification-endpoint-uri: http://localhost:8080/notifications/orion-ld
+
+blockchain-node:
+  api:
+    domain: http://localhost:3000
+    path:
+      configure-node: /api/v1/configureNode
+      publish: /api/v1/publishEvent
+      subscribe: /api/v1/subscribe
+  subscription:
+    notification-endpoint-uri: http://localhost:8080/notifications/blockchain-node
+    event-type: "ProductOffering"
+  node:
+    rpcAddress: https://red-t.alastria.io/v0/9461d9f4292b41230527d57ee90652a6
+    publicKeyHex: 0xb794f5ea0ba39494ce839613fffba74279579268
+
