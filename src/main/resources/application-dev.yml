@@ -22,7 +22,7 @@ spring:
 logging:
   level:
     org.springframework.security: INFO
-    es.in2.dome.blockchainconnector.core: DEBUG
+    es.in2.blockchain.connector: DEBUG
 management:
   endpoints:
     enabled-by-default: false
