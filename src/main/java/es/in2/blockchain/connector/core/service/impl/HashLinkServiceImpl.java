@@ -24,6 +24,8 @@ public class HashLinkServiceImpl implements HashLinkService {
 
     @Override
     public String createHashLink(String id, String data) {
+        log.debug(" > Creating hashlink...");
+        log.debug(" > Data: " + data);
         String resourceHash = createHashFromEntity(data);
         String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities();
         return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + resourceHash;
@@ -31,24 +33,25 @@ public class HashLinkServiceImpl implements HashLinkService {
 
     @Override
     public String resolveHashlink(String dataLocation) {
+        log.debug(" > Resolving hashlink...");
         // execute hashlink request to get entity from origin off-chain
         String retrievedEntity = executeHashlinkRequest(dataLocation);
         // verify entity with hashlink
         verifyHashlink(dataLocation, retrievedEntity);
+        log.debug(" > Hashlink resolved.");
         return retrievedEntity;
     }
 
     private String executeHashlinkRequest(String dataLocation) {
-        log.debug("Retrieving data info...");
         String offChainEntityOriginUrl = extractOffChainEntityOriginUrl(dataLocation);
-        String response = applicationUtils.getRequest(offChainEntityOriginUrl);
-        log.debug("Data retrieved: " + response);
-        return response;
+        return applicationUtils.getRequest(offChainEntityOriginUrl);
     }
 
     private void verifyHashlink(String dataLocation, String originOffChaiEntity) {
         String originEntityHash = extractHashLink(dataLocation);
+        log.debug(" > Origin entity hash: " + originEntityHash);
         String retrievedEntityHash = createHashFromEntity(originOffChaiEntity);
+        log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
         if (!retrievedEntityHash.equals(originEntityHash)) {
             throw new InvalidHashlinkComparisonException("Invalid hash: Origin entity hash is different than Retrieved entity");
         }

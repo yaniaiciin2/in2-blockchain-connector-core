@@ -29,7 +29,10 @@ public class BlockchainNodeProperties {
     @Value("${blockchain-node-if.node.rpcAddress}")
     private String nodeRpcAddress;
 
-    @Value("${blockchain-node-if.node.publicKeyHex}")
-    private String nodePublicKeyHex;
+    @Value("${blockchain-node-if.node.userEthereumAddress}")
+    private String nodeUserEthereumAddress;
+
+    @Value("${blockchain-node-if.subscription.active}")
+    private boolean subscriptionActive;
 
 }

@@ -10,10 +10,9 @@ orion-ld-if:
   api:
     domain: http://sp-blockchain-connector-orionld-intf:8080
     path:
-      subscription: /api/v1/subscriptions
-      entities: /api/v1/entities
+      subscription: /api/v1/subscribe
+      entities: /api/v1/publish
   subscription:
-    name: "default"
     type: "Subscription"
     notification-endpoint-uri: http://sp-blockchain-connector-core:8080/notifications/orion-ld
     entities: >
@@ -30,8 +29,7 @@ blockchain-node-if:
       publish: /api/v1/publishEvent
       subscribe: /api/v1/subscribe
   subscription:
-    notification-endpoint-uri: http://sp-blockchain-connector-core:8080/notifications/blockchain-node
-    event-type: "ProductOffering"
+    active: false
   node:
-    rpcAddress: http://52.19.141.129:22000 #https://red-t.alastria.io/v0/9461d9f4292b41230527d57ee90652a6
-    publicKeyHex: 0xb794f5ea0ba39494ce839613fffba74279579268
+    rpcAddress: https://red-t.alastria.io/v0/9461d9f4292b41230527d57ee90652a6 #http://52.19.141.129:22000
+    userEthereumAddress: "0xb794f5ea0ba39494ce839613fffba74279579268"

@@ -18,7 +18,7 @@ public class BlockchainNodeNotificationController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public void blockchainNodeNotification(@RequestBody BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
-        log.debug("Notification received: {}", blockchainNodeNotificationDTO.toString());
+        log.debug(">>> Notification received: {}", blockchainNodeNotificationDTO.toString());
         offChainEntityService.retrieveAndPublishEntityToOffChain(blockchainNodeNotificationDTO);
     }
 

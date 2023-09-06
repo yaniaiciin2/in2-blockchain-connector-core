@@ -39,12 +39,12 @@ public class ApplicationUtils {
         String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
         String body = response.thenApply(HttpResponse::body).join();
         if (statusCode.equals("200")) {
-            log.debug("Request successful");
+            log.debug(" > Request successful");
         } else if (statusCode.equals("404")) {
-            log.error("Not found");
+            log.error(" > !! Not found");
             throw new NoSuchElementException("Not found: " + body);
         } else {
-            log.error("Bad Request");
+            log.error(" > !! Bad Request");
             throw new RequestErrorException("Bad Request: " + body);
         }
     }
