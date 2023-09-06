@@ -1,5 +1,6 @@
 package es.in2.blockchain.connector.core.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
@@ -31,17 +32,23 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
     @Override
     public void createAndPublishEntityToOnChain(OrionLdNotificationDTO orionLdNotificationDTO) {
         // Create On-Chain Entity DTO
-        DomeEvent domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
+        DomeEvent domeEvent;
+        try {
+            domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
+        } catch (JsonProcessingException e) {
+            throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
+        }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
         publishDomeEvent(domeEvent);
     }
 
-    private DomeEvent createOnChainEntityDTO(OrionLdNotificationDTO orionLdNotificationDTO) {
+    private DomeEvent createOnChainEntityDTO(OrionLdNotificationDTO orionLdNotificationDTO) throws JsonProcessingException {
         log.debug("Creating On-Chain Entity DTO...");
         Map<String, Object> data = orionLdNotificationDTO.getData().get(0);
         String type = data.get("type").toString();
         String id = data.get("id").toString();
-        String dataLocation = hashLinkService.createHashLink(id, data.toString());
+        String dataString = new ObjectMapper().writeValueAsString(data);
+        String dataLocation = hashLinkService.createHashLink(id, dataString);
         DomeEvent domeEvent = DomeEvent.builder()
                 .eventType(type)
                 .dataLocation(dataLocation)

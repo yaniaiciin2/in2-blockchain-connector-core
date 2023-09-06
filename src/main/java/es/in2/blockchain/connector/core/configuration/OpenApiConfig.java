@@ -16,33 +16,26 @@ public class OpenApiConfig {
 
     @Value("${app.openapi.dev-url}")
     private String devUrl;
-    @Value("${app.openapi.test-url}")
-    private String testUrl;
-    @Value("${app.openapi.prod-url}")
-    private String prodUrl;
 
     @Bean
     public OpenAPI mymyOpenAPI() {
         // Defining servers
         // --- DEV
-        Server devServer = new Server();
-        devServer.setUrl(devUrl);
-        devServer.setDescription("Server URL in DEV Environment");
-        // --- TEST
-        Server testServer = new Server();
-        testServer.setUrl(testUrl);
-        testServer.setDescription("Server URL in TEST Environment");
-        // --- PROD
-        Server prodServer = new Server();
-        prodServer.setUrl(prodUrl);
-        prodServer.setDescription("Server URL in PROD Environment");
+        Server devServer = getServer();
         // Defining contact info
         Contact contact = getContact();
         // Defining license info
         License mitLicense = getLicense();
         // Defining application info
         Info info = getInfo(contact, mitLicense);
-        return new OpenAPI().info(info).servers(List.of(devServer, testServer, prodServer));
+        return new OpenAPI().info(info).servers(List.of(devServer));
+    }
+
+    private Server getServer() {
+        Server devServer = new Server();
+        devServer.setUrl(devUrl);
+        devServer.setDescription("Server URL in DEV Environment");
+        return devServer;
     }
 
     private static Info getInfo(Contact contact, License mitLicense) {

@@ -61,11 +61,13 @@ public class BlockchainNodeIConfig {
     @Bean
     @Profile("!default")
     public void setDefaultSubscriptions() {
-        try {
-            createDefaultSubscriptionToBlockchainNodeInterface();
-        } catch (Exception e) {
-            log.error("Error creating default subscription", e);
-            Thread.currentThread().interrupt();
+        if(blockchainNodeProperties.isSubscriptionActive()) {
+            try {
+                createDefaultSubscriptionToBlockchainNodeInterface();
+            } catch (Exception e) {
+                log.error("Error creating default subscription", e);
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -78,7 +80,7 @@ public class BlockchainNodeIConfig {
             log.debug(" > Blockchain Node Configuration url: {}", url);
 
             BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(blockchainNodeProperties.getNodeRpcAddress(),
-                    blockchainNodeProperties.getNodePublicKeyHex());
+                    blockchainNodeProperties.getNodeUserEthereumAddress());
             String body = new ObjectMapper().writeValueAsString(blockchainNodeDTO);
             log.debug(" > Blockchain Node Configuration: {}", body);
 

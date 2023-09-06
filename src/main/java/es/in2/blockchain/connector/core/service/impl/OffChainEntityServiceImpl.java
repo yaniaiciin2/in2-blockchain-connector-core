@@ -20,17 +20,21 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
 
     @Override
     public void retrieveAndPublishEntityToOffChain(BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
+        log.info(">>> Retrieving and publishing entity to off-chain...");
         // retrieve entity from origin off-chain using dataLocation
         String dataLocation = blockchainNodeNotificationDTO.getDataLocation();
-        log.debug("Retrieving entity from dataLocation: {}", dataLocation);
+        log.debug(" > Data Location: {}", dataLocation);
         // verify entity with hashlink
         String retrievedEntity = hashLinkService.resolveHashlink(dataLocation);
         // publish retrieved entity to our off-chain storage
         publishEntityToDestinationOffChain(retrievedEntity);
+        log.info("  > Entity published to off-chain");
     }
 
     private void publishEntityToDestinationOffChain(String retrievedEntity) {
-        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getOrionLdPathEntities();
+        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities();
+        log.debug(" > Publishing entity to: {}", orionLdEntitiesUrl);
+        log.debug(" > Entity to publish: {}", retrievedEntity);
         applicationUtils.postRequest(orionLdEntitiesUrl, retrievedEntity);
     }
 

@@ -66,7 +66,7 @@ public class OrionLdIConfig {
                 throw new CommunicationException("Error creating default subscription");
             }
 
-            log.info("  > Orion-LD Entities subscription created successfully.");
+            log.info(" > Orion-LD Entities subscription created successfully.");
         } catch (CommunicationException | InterruptedException | ExecutionException | JsonProcessingException e) {
             log.error("Error creating default subscription", e);
             Thread.currentThread().interrupt();
