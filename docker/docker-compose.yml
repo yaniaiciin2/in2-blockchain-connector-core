@@ -1,27 +1,113 @@
 version: "3.8"
 services:
 
-  # Blockchain Connector
-  blockchain-connector-2:
-    container_name: blockchain-connector-2
-    image: blockchain-connector
+  # Service Provider
+  sp-orionld:
+    container_name: sp-orionld
+    image: fiware/orion-ld:latest
+    command: "-dbhost sp-orionld-mongo -port 1026"
+    ports:
+      - "1027:1026"
+    links:
+      - sp-orionld-mongo
+
+  sp-orionld-mongo:
+    container_name: sp-orionld-mongo
+    image: mongo:4.4
+    command: "--nojournal"
+    volumes:
+      - SP_ORIONLD:/data/db
+      - SP_ORIONLD_DBCONFIG:/data/configdb
+
+  sp-blockchain-connector-orionld-intf:
+    container_name: sp-blockchain-connector-orionld-intf
+    image: blkconn-orionld-intf
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
-      - "3311:3310"
-    networks:
-      - local_net
+      - "8081:8080"
+    volumes:
+      - ./sp-orionld-config.yml:/src/main/resources/orionld-config.yml
 
-  blockchain-connector:
-    container_name: blockchain-connector
-    image: blockchain-connector
+  sp-blockchain-connector-node-intf:
+    container_name: sp-blockchain-connector-node-intf
+    image: blkconn-node-intf
+    ports:
+      - "8083:8080"
+
+  sp-blockchain-connector-core:
+    container_name: sp-blockchain-connector-core
+    image: blkconn-core
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
-      - "3310:3310"
-    networks:
-      - local_net
+      - "8082:8080"
+    volumes:
+      - ./sp-orionld-config.yml:/src/main/resources/integration-config.yml
+    links:
+      - sp-blockchain-connector-orionld-intf
+      - sp-blockchain-connector-node-intf
 
+  # Marketplace 1
 
-networks:
-  local_net:
+#  mkt1-orionld:
+#    container_name: mkt1-orionld
+#    image: fiware/orion-ld:latest
+#    command: "-dbhost mkt1-orionld-mongo -port 1026"
+#    ports:
+#      - "1028:1026"
+#    links:
+#      - mkt1-orionld-mongo
+#    networks:
+#      - local_net
+#
+#  mkt1-orionld-mongo:
+#    container_name: mkt1-orionld-mongo
+#    image: mongo:4.4
+#    command: "--nojournal"
+#    volumes:
+#      - MKT1_ORIONLD:/data/db
+#      - MKT1_ORIONLD_DBCONFIG:/data/configdb
+#    networks:
+#      - local_net
+#
+#  mkt1-blockchain-connector-orionld-intf:
+#    container_name: mkt1-blockchain-connector-orionld-intf
+#    image: blkconn-orionld-intf
+#    environment:
+#      - "SPRING_PROFILES_ACTIVE=dev"
+#    ports:
+#      - "8085:8080"
+#    volumes:
+#      - ./mkt-orionld-config.yml:/src/main/resources/orionld-config.yml
+#    networks:
+#      - local_net
+#
+#  mkt1-blockchain-connector-node-intf:
+#    container_name: mkt1-blockchain-connector-node-intf
+#    image: blkconn-node-intf
+#    ports:
+#      - "8087:8080"
+#    networks:
+#      - local_net
+#
+#  mkt1-blockchain-connector-core:
+#    container_name: mkt1-blockchain-connector-core
+#    image: blkconn-core
+#    environment:
+#      - "SPRING_PROFILES_ACTIVE=dev"
+#    ports:
+#      - "8084:8080"
+#    volumes:
+#      - ./mkt-orionld-config.yml:/src/main/resources/integration-config.yml
+#    links:
+#      - mkt1-blockchain-connector-orionld-intf
+#      - mkt1-blockchain-connector-node-intf
+#    networks:
+#      - local_net
+
+volumes:
+  SP_ORIONLD:
+  SP_ORIONLD_DBCONFIG:
+  MKT1_ORIONLD:
+  MKT1_ORIONLD_DBCONFIG:

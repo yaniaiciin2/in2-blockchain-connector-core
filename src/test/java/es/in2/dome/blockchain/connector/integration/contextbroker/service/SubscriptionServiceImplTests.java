@@ -4,7 +4,7 @@ package es.in2.dome.blockchain.connector.integration.contextbroker.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.dome.blockchain.connector.integration.contextbroker.configuration.ContextBrokerConfigApi;
-import es.in2.dome.blockchain.connector.utils.ApplicationUtils;
+import es.in2.dome.blockchainconnector.core.utils.ApplicationUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

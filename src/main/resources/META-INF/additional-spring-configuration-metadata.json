@@ -1,43 +1,42 @@
 {
   "properties": [
     {
-
-      "name": "api.access-token",
+      "name": "orion-ld-if.orion-ld.path.subscriptions",
       "type": "java.lang.String",
-      "description": " Valid Access Token."
+      "description": "The path to the subscription API."
     },
     {
-      "name": "api.subscription-url",
+      "name": "orion-ld-if.api.path.subscription",
       "type": "java.lang.String",
-      "description": "The URL to the subscription API."
+      "description": "The path to the subscription API."
     },
     {
-      "name": "api.entities-url",
+      "name": "orion-ld-if.api.path.entities",
       "type": "java.lang.String",
-      "description": "The URL to OCB entities."
+      "description": "The path to the entities API."
     },
     {
-      "name": "subscription.name",
+      "name": "orion-ld-if.subscription.name",
       "type": "java.lang.String",
       "description": "Subscription name used to build the subscription ID."
     },
     {
-      "name": "subscription.entities.type",
-      "type": "java.lang.String",
-      "description": "The type of entities to subscribe to."
+      "name": "orion-ld-if.subscription.entities",
+      "type": "java.util.List",
+      "description": "The list of entities to subscribe to."
     },
     {
-      "name": "subscription.id-prefix",
+      "name": "orion-ld-if.subscription.id-prefix",
       "type": "java.lang.String",
       "description": "The prefix to use for the subscription ID."
     },
     {
-      "name": "subscription.type",
+      "name": "orion-ld-if.subscription.type",
       "type": "java.lang.String",
       "description": "The type of subscription. It always has to be 'Subscription'."
     },
     {
-      "name": "subscription.notification-endpoint-uri",
+      "name": "orion-ld-if.subscription.notification-endpoint-uri",
       "type": "java.lang.String",
       "description": "The URI of the notification endpoint."
     }
