@@ -55,7 +55,6 @@ It is built using Java 17, Spring Boot 3.x, and Gradle.
 
 ## Deployment
 
-# Contribute
 
 ## Orion-LD Documentation and Tools
 - [Orion-LD Context Broker GitHub Repository with Documentation](https://github.com/FIWARE/context.Orion-LD)
@@ -65,7 +64,6 @@ It is built using Java 17, Spring Boot 3.x, and Gradle.
 # License
 - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
-## Third Party Licenses
 
 # Acknowledgments
 We extend heartfelt gratitude to [FIWARE Foundation](https://www.fiware.org/foundation/), DOME teams project, [Alastria](https://alastria.io/), and [DigitelTS](https://digitelts.es/) for their invaluable contributions to our project. Their support, expertise, and resources have been pivotal in shaping this solution, driving innovation, and overcoming challenges. Without their collaboration, this project would not have been possible. We are honored to have worked with such visionary and innovative partners, and we look forward to future collaborations and successes together. Thank you for being essential pillars in our journey.
