@@ -64,41 +64,6 @@ public class ApplicationUtils {
         checkResponse(response);
     }
 
-    /*
-        Decide what to do with these methods:
-
-        public void putRequest(String url, String requestBody) {
-            // Create request
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .headers(BlockchainConnectorUtils.CONTENT_HEADER, APPLICATION_JSON_HEADER)
-                    .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
-            // Send request asynchronously
-            CompletableFuture<HttpResponse<String>> response =
-                    client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-            // Verify Response HttpStatus
-            checkResponse(response);
-        }
-
-        public void patchRequest(String url, String requestBody) {
-            // Create request
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .headers(BlockchainConnectorUtils.CONTENT_HEADER, APPLICATION_JSON_HEADER)
-                    .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))  // Use PATCH method
-                    .build();
-            // Send request asynchronously
-            CompletableFuture<HttpResponse<String>> response =
-                    client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-            // Verify Response HttpStatus
-            checkResponse(response);
-        }
-
-     */
-
     private void checkResponse(CompletableFuture<HttpResponse<String>> response) {
         String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
         String body = response.thenApply(HttpResponse::body).join();
