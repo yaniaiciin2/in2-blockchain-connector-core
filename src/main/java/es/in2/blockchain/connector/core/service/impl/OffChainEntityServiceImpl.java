@@ -64,10 +64,9 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
 
     private boolean entityExists(String retrievedEntity) {
         String entityId = applicationUtils.jsonExtractId(retrievedEntity);
-        log.debug("> id: " +entityId);
+        log.debug("> Exctracted Entity ID: " +entityId);
         String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/"
                 + entityId;
-        log.debug("> orionURL: " +orionLdEntitiesUrl);
         String statusCode = applicationUtils.getRequestCode(orionLdEntitiesUrl);
 
         return statusCode.equals("200");
