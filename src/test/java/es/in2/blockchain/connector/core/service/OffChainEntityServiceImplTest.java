@@ -33,23 +33,78 @@ class OffChainEntityServiceImplTest {
 
     }
 
-    @Test
-    void testRetrieveAndPublishEntityToOffChain() {
-        // Arrange
-        BlockchainNodeNotificationDTO notificationDTO = new BlockchainNodeNotificationDTO();
-        notificationDTO.setDataLocation("sampleDataLocation");
-        String retrievedEntity = "sampleEntity";
+   @Test
+    void testRetrieveAndPublishEntityToOffChain_EntityExists_EntitiesNotEqual() {
+      // Arrange
+      String dataLocation = "exampleDataLocation";
+      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
+      String entityId = "exampleEntityId";
+      String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-        when(hashLinkService.resolveHashlink(any())).thenReturn(retrievedEntity);
-        when(orionLdProperties.getApiDomain()).thenReturn("https://example.com");
-        when(orionLdProperties.getApiPathEntities()).thenReturn("/entities");
+      // Mock the behavior of dependencies
+      when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
+      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
+      when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn("existingEntity");
+      when(applicationUtils.getRequestCode(anyString())).thenReturn("200");
+      when(hashLinkService.compareHashLinks(dataLocation, "existingEntity")).thenReturn(false);
 
-        // Act
-        offChainEntityService.retrieveAndPublishEntityToOffChain(notificationDTO);
+      // Act
+      offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
 
-        // Assert
-        // You can add assertions based on your specific logic and behavior.
-        verify(hashLinkService, times(1)).resolveHashlink("sampleDataLocation");
-        verify(applicationUtils, times(1)).postRequest("https://example.com/entities", "sampleEntity");
-    }
+      // Assert
+      verify(applicationUtils, times(1)).patchRequest(any(), any());
+   }
+
+   @Test
+   void testRetrieveAndPublishEntityToOffChain_EntityExists_EntitiesEqual() {
+      // Arrange
+      String dataLocation = "exampleDataLocation";
+      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
+      String entityId = "exampleEntityId";
+      String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
+
+      // Mock the behavior of dependencies
+      when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
+      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
+      when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn(retrievedEntity);
+      when(applicationUtils.getRequestCode(anyString())).thenReturn("200");
+      when(hashLinkService.compareHashLinks(dataLocation, retrievedEntity)).thenReturn(true);
+
+      // Act
+      offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
+
+      // Assert
+      verify(applicationUtils, never()).postRequest(any(), any());
+
+   }
+
+   @Test
+   void testRetrieveAndPublishEntityToOffChain_EntityDoesNotExist() {
+      // Arrange
+      String dataLocation = "exampleDataLocation";
+      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
+      String entityId = "exampleEntityId";
+      String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
+
+      // Mock the behavior of dependencies
+      when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
+      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
+      when(applicationUtils.getRequestCode(any())).thenReturn("404");
+
+      // Act
+      offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
+
+      // Assert
+       verify(applicationUtils, times(1)).postRequest(any(), any());
+      // Add more assertions if needed
+   }
+
+   // Helper method to create a BlockchainNodeNotificationDTO
+   private BlockchainNodeNotificationDTO createNotification(String dataLocation) {
+      return BlockchainNodeNotificationDTO.builder()
+              .dataLocation(dataLocation)
+              .build();
+   }
+
+   // Add more test methods and assertions as needed
 }

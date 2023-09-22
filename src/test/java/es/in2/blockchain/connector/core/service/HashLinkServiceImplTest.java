@@ -12,9 +12,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.security.NoSuchAlgorithmException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class HashLinkServiceImplTest {
 
@@ -79,5 +78,33 @@ class HashLinkServiceImplTest {
 
         // Assert
         assertThrows(InvalidHashlinkComparisonException.class, () -> hashLinkService.resolveHashlink(dataLocation));
+    }
+
+    @Test
+    void testCompareHashlinks() throws Exception {
+        // Mock the createHashFromEntity method to return a specific value
+        when(applicationUtils.calculateSHA256Hash(anyString())).thenReturn("mockedHash");
+        // Call the compareHashlinks method with some input parameters
+        String dataLocation = "https://example.com/entity?hl=mockedHash";
+        String originOffChaiEntity = "This is the entity data";
+        boolean result = hashLinkService.compareHashLinks(dataLocation, originOffChaiEntity);
+        // Assert that the expected result is returned
+        assertTrue(result);
+        // Verify that the createHashFromEntity method was called with the expected parameter
+        verify(applicationUtils).calculateSHA256Hash(originOffChaiEntity);
+    }
+
+    @Test
+     void testCompareHashlinksWithDifferentOnes() throws Exception {
+        // Mock the createHashFromEntity method to return a specific value
+        when(applicationUtils.calculateSHA256Hash(anyString())).thenReturn("different");
+        // Call the compareHashlinks method with some input parameters
+        String dataLocation = "https://example.com/entity?hl=mockedHash";
+        String originOffChaiEntity = "This is the entity data";
+        boolean result = hashLinkService.compareHashLinks(dataLocation, originOffChaiEntity);
+        // Assert that the expected result is returned
+        assertFalse(result);
+        // Verify that the createHashFromEntity method was called with the expected parameter
+        verify(applicationUtils).calculateSHA256Hash(originOffChaiEntity);
     }
 }
