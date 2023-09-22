@@ -28,22 +28,19 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
         String retrievedEntity = hashLinkService.resolveHashlink(dataLocation);
 
         if (entityExists(retrievedEntity)) {
+            log.debug("> Entity exists");
             String entityId = applicationUtils.jsonExtractId(retrievedEntity);
             String orionLdEntitiesUrl = buildOrionLdEntityUrl(entityId);
             log.debug("> Orion-LD Existing Entity URL: " + orionLdEntitiesUrl);
 
             String existingEntity = applicationUtils.getRequest(orionLdEntitiesUrl);
+            log.debug(retrievedEntity);
 
-            if (!areEntitiesEqual(retrievedEntity, existingEntity)) {
+            if (!areEntitiesEqual(dataLocation, existingEntity)) {
                 log.debug("> Entities not equal");
-                //TODO COMPROBAR DIFERENCIAS JSON
-                
-                //TODO CREAR JSON PARA HACER PATCH REQUEST
-
-
                 // Patch Request
-                applicationUtils.patchRequest(orionLdEntitiesUrl, retrievedEntity);
-                log.info("  > Entity updated in Orion-LD");
+                applicationUtils.patchRequest(orionLdEntitiesUrl + "/attrs", retrievedEntity);
+                log.info("  > Entity updated in off-chain");
             } else {
                 log.info("> Same entities. No changes.");
             }
