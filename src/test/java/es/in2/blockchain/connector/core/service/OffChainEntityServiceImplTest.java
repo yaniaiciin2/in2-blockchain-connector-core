@@ -41,7 +41,6 @@ class OffChainEntityServiceImplTest {
       String entityId = "exampleEntityId";
       String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-      // Mock the behavior of dependencies
       when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
       when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
       when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn("existingEntity");
@@ -63,17 +62,17 @@ class OffChainEntityServiceImplTest {
       String entityId = "exampleEntityId";
       String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-      // Mock the behavior of dependencies
       when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
       when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
       when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn(retrievedEntity);
       when(applicationUtils.getRequestCode(anyString())).thenReturn("200");
-      when(hashLinkService.compareHashLinks(dataLocation, retrievedEntity)).thenReturn(true);
+      when(hashLinkService.compareHashLinks(any(), any())).thenReturn(true);
 
       // Act
       offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
 
       // Assert
+      verify(applicationUtils, never()).patchRequest(any(), any());
       verify(applicationUtils, never()).postRequest(any(), any());
 
    }
@@ -84,9 +83,7 @@ class OffChainEntityServiceImplTest {
       String dataLocation = "exampleDataLocation";
       String retrievedEntity = "retrievedEntity"; // Retrieved entity data
       String entityId = "exampleEntityId";
-      String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-      // Mock the behavior of dependencies
       when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
       when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
       when(applicationUtils.getRequestCode(any())).thenReturn("404");
@@ -96,7 +93,6 @@ class OffChainEntityServiceImplTest {
 
       // Assert
        verify(applicationUtils, times(1)).postRequest(any(), any());
-      // Add more assertions if needed
    }
 
    // Helper method to create a BlockchainNodeNotificationDTO
@@ -106,5 +102,4 @@ class OffChainEntityServiceImplTest {
               .build();
    }
 
-   // Add more test methods and assertions as needed
 }
