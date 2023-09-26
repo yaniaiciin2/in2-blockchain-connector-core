@@ -1,20 +1,18 @@
-# Context Broker configuration file
-
 # Orion-LD Interface Configuration
 orion-ld-if:
   orion-ld:
-    domain: http://sp-orionld:1026
+    domain: http://provider-orionld:1026
     path:
       entities: /ngsi-ld/v1/entities
       subscriptions: /ngsi-ld/v1/subscriptions
   api:
-    domain: http://sp-blockchain-connector-orionld-intf:8080
+    domain: http://provider-orionld-adapter:8080
     path:
       subscription: /api/v1/subscribe
       entities: /api/v1/publish
   subscription:
     type: "Subscription"
-    notification-endpoint-uri: http://sp-blockchain-connector-core:8080/notifications/orion-ld
+    notification-endpoint-uri: http://provider-blockchain-connector-core:8080/notifications/orion-ld
     entities: >
       ProductOrder,
       ProductOffering
@@ -23,7 +21,7 @@ orion-ld-if:
 # Blockchain Interface Configuration
 blockchain-node-if:
   api:
-    domain: http://sp-blockchain-connector-node-intf:8080
+    domain: http://provider-dlt-adapter:8080
     path:
       configure-node: /api/v1/configureNode
       publish: /api/v1/publishEvent

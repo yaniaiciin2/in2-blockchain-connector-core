@@ -1,117 +1,118 @@
 version: "3.8"
+
 services:
 
-  # Service Provider
-  sp-orionld:
-    container_name: sp-orionld
-    image: fiware/orion-ld:latest
-    command: "-dbhost sp-orionld-mongo -port 1026"
-    ports:
-      - "1027:1026"
-    links:
-      - sp-orionld-mongo
-    networks:
-      - local_network
-
-  sp-orionld-mongo:
-    container_name: sp-orionld-mongo
-    image: mongo:4.4
-    command: "--nojournal"
-    volumes:
-      - SP_ORIONLD:/data/db
-      - SP_ORIONLD_DBCONFIG:/data/configdb
-    networks:
-      - local_network
-
-  sp-blockchain-connector-orionld-intf:
-    container_name: sp-blockchain-connector-orionld-intf
-    image: blkconn-orionld-intf
+  # Service Provider Instance
+  provider-blockchain-connector-core:
+    container_name: provider-blockchain-connector-core
+    image: ocanades/blockchain-connector-core:1.0.0
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
       - "8081:8080"
     volumes:
-      - ./sp-config.yml:/src/main/resources/custom-config.yml
+      - ./provider-config.yml:/src/main/resources/integration-config.yml
+    links:
+      - provider-orionld-adapter
+      - provider-dlt-adapter
     networks:
       - local_network
 
-  sp-blockchain-connector-node-intf:
-    container_name: sp-blockchain-connector-node-intf
-    image: blkconn-node-intf
-    ports:
-      - "8083:8080"
-    networks:
-      - local_network
-
-  sp-blockchain-connector-core:
-    container_name: sp-blockchain-connector-core
-    image: blkconn-core
+  provider-orionld-adapter:
+    container_name: provider-orionld-adapter
+    image: ocanades/orionld-adapter:1.0.0
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
       - "8082:8080"
     volumes:
-      - ./sp-config.yml:/src/main/resources/integration-config.yml
-    links:
-      - sp-blockchain-connector-orionld-intf
-      - sp-blockchain-connector-node-intf
+      - ./provider-config.yml:/src/main/resources/custom-config.yml
     networks:
       - local_network
 
-  # Marketplace 1
-  mkt1-orionld:
-    container_name: mkt1-orionld
-    image: fiware/orion-ld:latest
-    command: "-dbhost mkt1-orionld-mongo -port 1026"
+  provider-dlt-adapter:
+    container_name: provider-dlt-adapter
+    image: ocanades/dlt-adapter:1.0.0
     ports:
-      - "1028:1026"
-    links:
-      - mkt1-orionld-mongo
+      - "8083:8080"
     networks:
       - local_network
 
-  mkt1-orionld-mongo:
-    container_name: mkt1-orionld-mongo
+  provider-orionld:
+    container_name: provider-orionld
+    image: fiware/orion-ld:latest
+    command: "-dbhost provider-mongo -port 1026"
+    ports:
+      - "1027:1026"
+    links:
+      - provider-mongo
+    networks:
+      - local_network
+
+  provider-mongo:
+    container_name: provider-mongo
     image: mongo:4.4
     command: "--nojournal"
     volumes:
-      - MKT1_ORIONLD:/data/db
-      - MKT1_ORIONLD_DBCONFIG:/data/configdb
+      - provider_data:/data/db
+      - provider_db_config:/data/configdb
     networks:
       - local_network
 
-  mkt1-blockchain-connector-orionld-intf:
-    container_name: mkt1-blockchain-connector-orionld-intf
-    image: blkconn-orionld-intf
+  # Marketplace Instance
+  marketplace-blockchain-connector-core:
+    container_name: marketplace-blockchain-connector-core
+    image: ocanades/blockchain-connector-core:1.0.0
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     ports:
-      - "8085:8080"
+      - "8091:8080"
     volumes:
-      - ./mkt1-config.yml:/src/main/resources/custom-config.yml
-    networks:
-      - local_network
-
-  mkt1-blockchain-connector-node-intf:
-    container_name: mkt1-blockchain-connector-node-intf
-    image: blkconn-node-intf
-    ports:
-      - "8087:8080"
-    networks:
-      - local_network
-
-  mkt1-blockchain-connector-core:
-    container_name: mkt1-blockchain-connector-core
-    image: blkconn-core
-    environment:
-      - "SPRING_PROFILES_ACTIVE=dev"
-    ports:
-      - "8084:8080"
-    volumes:
-      - ./mkt1-config.yml:/src/main/resources/integration-config.yml
+      - ./marketplace-config.yml:/src/main/resources/integration-config.yml
     links:
-      - mkt1-blockchain-connector-orionld-intf
-      - mkt1-blockchain-connector-node-intf
+      - marketplace-orionld-adapter
+      - marketplace-dlt-adapter
+    networks:
+      - local_network
+
+  marketplace-orionld-adapter:
+    container_name: marketplace-orionld-adapter
+    image: ocanades/orionld-adapter:1.0.0
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    ports:
+      - "8092:8080"
+    volumes:
+      - ./marketplace-config.yml:/src/main/resources/custom-config.yml
+    networks:
+      - local_network
+
+  marketplace-dlt-adapter:
+    container_name: marketplace-dlt-adapter
+    image: ocanades/dlt-adapter:1.0.0
+    ports:
+      - "8093:8080"
+    networks:
+      - local_network
+
+  marketplace-orionld:
+    container_name: marketplace-orionld
+    image: fiware/orion-ld:latest
+    command: "-dbhost marketplace-mongo -port 1026"
+    ports:
+      - "1037:1026"
+    links:
+      - marketplace-mongo
+    networks:
+      - local_network
+
+  marketplace-mongo:
+    container_name: marketplace-mongo
+    image: mongo:4.4
+    command: "--nojournal"
+    volumes:
+      - marketplace_data:/data/db
+      - marketplace_db_config:/data/configdb
     networks:
       - local_network
 
@@ -120,7 +121,7 @@ networks:
     driver: bridge
 
 volumes:
-  SP_ORIONLD:
-  SP_ORIONLD_DBCONFIG:
-  MKT1_ORIONLD:
-  MKT1_ORIONLD_DBCONFIG:
+  provider_data:
+  provider_db_config:
+  marketplace_data:
+  marketplace_db_config:
