@@ -42,6 +42,15 @@ public class HashLinkServiceImpl implements HashLinkService {
         return retrievedEntity;
     }
 
+    @Override
+    public boolean compareHashLinksFromEntities(String retrievedEntity, String originOffChainEntity) {
+        String originEntityHash = createHashFromEntity(retrievedEntity);
+        log.debug(" > Origin entity hash: " + originEntityHash);
+        String retrievedEntityHash = createHashFromEntity(originOffChainEntity);
+        log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
+        return retrievedEntityHash.equals(originEntityHash);
+    }
+
     private String executeHashlinkRequest(String dataLocation) {
         String offChainEntityOriginUrl = extractOffChainEntityOriginUrl(dataLocation);
         return applicationUtils.getRequest(offChainEntityOriginUrl);
