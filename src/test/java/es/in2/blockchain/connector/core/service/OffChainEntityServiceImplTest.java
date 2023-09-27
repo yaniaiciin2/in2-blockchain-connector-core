@@ -10,7 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.NoSuchElementException;
+
 import static org.mockito.Mockito.*;
+
 
 class OffChainEntityServiceImplTest {
 
@@ -37,15 +40,41 @@ class OffChainEntityServiceImplTest {
     void testRetrieveAndPublishEntityToOffChain_EntityExists_EntitiesNotEqual() {
       // Arrange
       String dataLocation = "exampleDataLocation";
-      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
-      String entityId = "exampleEntityId";
+      String retrievedEntity = """
+              "{\\n" +
+                  "  \\"@context\\": \\"https://schema.lab.fiware.org/ld/context\\",\\n" +
+                  "  \\"@type\\": \\"Device\\",\\n" +
+                  "  \\"id\\": \\"urn:ngsi-ld:Device:001\\",\\n" +
+                  "  \\"name\\": {\\n" +
+                  "    \\"type\\": \\"Text\\",\\n" +
+                  "    \\"value\\": \\"Sensor de Temperatura\\"\\n" +
+                  "  },\\n" +
+                  "  \\"temperature\\": {\\n" +
+                  "    \\"type\\": \\"Number\\",\\n" +
+                  "    \\"value\\": 25.5,\\n" +
+                  "    \\"metadata\\": {\\n" +
+                  "      \\"unitCode\\": {\\n" +
+                  "        \\"type\\": \\"Text\\",\\n" +
+                  "        \\"value\\": \\"CEL\\"\\n" +
+                  "      }\\n" +
+                  "    }\\n" +
+                  "  },\\n" +
+                  "  \\"location\\": {\\n" +
+                  "    \\"type\\": \\"GeoProperty\\",\\n" +
+                  "    \\"value\\": {\\n" +
+                  "      \\"type\\": \\"Point\\",\\n" +
+                  "      \\"coordinates\\": [-3.7037902, 40.4167754]\\n" +
+                  "    }\\n" +
+                  "  },\\n" +
+                  "  \\"status\\": {\\n" +
+                  "    \\"type\\": \\"Text\\",\\n" +
+                  "    \\"value\\": \\"Operativo\\"\\n" +
+                  "  }\\n" +
+                  "}";"""; // Retrieved entity data
       String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
       when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
-      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
       when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn("existingEntity");
-      when(applicationUtils.getRequestCode(anyString())).thenReturn("200");
-      when(hashLinkService.compareHashLinks(dataLocation, "existingEntity")).thenReturn(false);
 
       // Act
       offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
@@ -58,15 +87,42 @@ class OffChainEntityServiceImplTest {
    void testRetrieveAndPublishEntityToOffChain_EntityExists_EntitiesEqual() {
       // Arrange
       String dataLocation = "exampleDataLocation";
-      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
-      String entityId = "exampleEntityId";
+      String retrievedEntity = """
+              {
+                "@context": "https://schema.lab.fiware.org/ld/context",
+                "@type": "Device",
+                "id": "urn:ngsi-ld:Device:001",
+                "name": {
+                  "type": "Text",
+                  "value": "Sensor de Temperatura"
+                },
+                "temperature": {
+                  "type": "Number",
+                  "value": 25.5,
+                  "metadata": {
+                    "unitCode": {
+                      "type": "Text",
+                      "value": "CEL"
+                    }
+                  }
+                },
+                "location": {
+                  "type": "GeoProperty",
+                  "value": {
+                    "type": "Point",
+                    "coordinates": [-3.7037902, 40.4167754]
+                  }
+                },
+                "status": {
+                  "type": "Text",
+                  "value": "Operativo"
+                }
+              }"""; // Retrieved entity data
       String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-      when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
-      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
+      when(hashLinkService.resolveHashlink(any())).thenReturn(retrievedEntity);
       when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn(retrievedEntity);
-      when(applicationUtils.getRequestCode(anyString())).thenReturn("200");
-      when(hashLinkService.compareHashLinks(any(), any())).thenReturn(true);
+      when(hashLinkService.compareHashLinksFromEntities(any(), any())).thenReturn(true);
 
       // Act
       offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
@@ -80,13 +136,43 @@ class OffChainEntityServiceImplTest {
    @Test
    void testRetrieveAndPublishEntityToOffChain_EntityDoesNotExist() {
       // Arrange
-      String dataLocation = "exampleDataLocation";
-      String retrievedEntity = "retrievedEntity"; // Retrieved entity data
-      String entityId = "exampleEntityId";
+      String dataLocation = "exampleDataLocation?hl=e021ea41bdde9dc49e266d1d1b9c71a098ff79b86edcc764edc2dc803ca1f927";
+      String retrievedEntity = """
+              {
+                "@context": "https://schema.lab.fiware.org/ld/context",
+                "@type": "Device",
+                "id": "urn:ngsi-ld:Device:001",
+                "name": {
+                  "type": "Text",
+                  "value": "Sensor de Temperatura"
+                },
+                "temperature": {
+                  "type": "Number",
+                  "value": 25.5,
+                  "metadata": {
+                    "unitCode": {
+                      "type": "Text",
+                      "value": "CEL"
+                    }
+                  }
+                },
+                "location": {
+                  "type": "GeoProperty",
+                  "value": {
+                    "type": "Point",
+                    "coordinates": [-3.7037902, 40.4167754]
+                  }
+                },
+                "status": {
+                  "type": "Text",
+                  "value": "Operativo"
+                }
+              }""";
+
 
       when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
-      when(applicationUtils.jsonExtractId(retrievedEntity)).thenReturn(entityId);
-      when(applicationUtils.getRequestCode(any())).thenReturn("404");
+      when(applicationUtils.getRequest(any())).thenThrow(NoSuchElementException.class);
+
 
       // Act
       offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));

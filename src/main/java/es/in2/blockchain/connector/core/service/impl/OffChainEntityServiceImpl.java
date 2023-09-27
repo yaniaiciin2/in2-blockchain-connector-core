@@ -1,5 +1,7 @@
 package es.in2.blockchain.connector.core.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.OffChainEntityService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
@@ -8,6 +10,8 @@ import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProp
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -27,31 +31,46 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
 
         String retrievedEntity = hashLinkService.resolveHashlink(dataLocation);
 
-        if (entityExists(retrievedEntity)) {
+        try{
+            String entityId = getIdFromOrionLdEntity(retrievedEntity);
+            String existingEntity = retrieveExistingOrionLdEntity(entityId);
             log.debug("> Entity exists");
-            String entityId = applicationUtils.jsonExtractId(retrievedEntity);
-            String orionLdEntitiesUrl = buildOrionLdEntityUrl(entityId);
-            log.debug("> Orion-LD Existing Entity URL: " + orionLdEntitiesUrl);
+            compareAndPublishEntities(existingEntity, retrievedEntity);
 
-            String existingEntity = applicationUtils.getRequest(orionLdEntitiesUrl);
-            log.debug(retrievedEntity);
+        } catch(NoSuchElementException e) {
 
-            if (!areEntitiesEqual(dataLocation, existingEntity)) {
-                log.debug("> Entities not equal");
-                // Patch Request
-                applicationUtils.patchRequest(orionLdEntitiesUrl + "/attrs", retrievedEntity);
-                log.info("  > Entity updated in off-chain");
-            } else {
-                log.info("> Same entities. No changes.");
-            }
-        } else {
             publishEntityToDestinationOffChain(retrievedEntity);
             log.info("  > Entity published to off-chain");
+
         }
     }
 
+
+
     private String buildOrionLdEntityUrl(String entityId) {
         return orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/" + entityId;
+    }
+
+    private String getIdFromOrionLdEntity(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            JsonNode idNode = jsonNode.get("id");
+
+            if (idNode != null) {
+                return idNode.asText();
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String retrieveExistingOrionLdEntity(String entityId) {
+        String orionLdEntitiesUrl = buildOrionLdEntityUrl(entityId);
+        return applicationUtils.getRequest(orionLdEntitiesUrl);
     }
 
 
@@ -62,18 +81,22 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
         applicationUtils.postRequest(orionLdEntitiesUrl, retrievedEntity);
     }
 
-    private boolean entityExists(String retrievedEntity) {
-        String entityId = applicationUtils.jsonExtractId(retrievedEntity);
-        log.debug("> Exctracted Entity ID: " +entityId);
-        String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/"
-                + entityId;
-        String statusCode = applicationUtils.getRequestCode(orionLdEntitiesUrl);
-
-        return statusCode.equals("200");
+    private boolean areEntitiesEqual(String retrievedEntity, String existingEntity) {
+        return hashLinkService.compareHashLinksFromEntities(retrievedEntity, existingEntity);
     }
 
-    private boolean areEntitiesEqual(String datalocation, String existingEntity) {
-        return hashLinkService.compareHashLinks(datalocation, existingEntity);
+    private void compareAndPublishEntities(String existingEntity, String retrievedEntity) {
+        if(!areEntitiesEqual(retrievedEntity, existingEntity)) {
+            log.debug("> Entities not equal");
+            String retrievedEntityId = getIdFromOrionLdEntity(retrievedEntity);
+            String retrievedEntityUrl = buildOrionLdEntityUrl(retrievedEntityId) + "/attrs";
+            applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity);
+            log.info("  > Entity updated to off-chain");
+
+        } else {
+            log.info("> Same entities. No changes.");
+
+        }
     }
 
 }

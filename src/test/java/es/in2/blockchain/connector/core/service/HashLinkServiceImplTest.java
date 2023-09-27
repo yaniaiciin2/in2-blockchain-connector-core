@@ -87,7 +87,7 @@ class HashLinkServiceImplTest {
         // Call the compareHashlinks method with some input parameters
         String dataLocation = "https://example.com/entity?hl=mockedHash";
         String originOffChaiEntity = "This is the entity data";
-        boolean result = hashLinkService.compareHashLinks(dataLocation, originOffChaiEntity);
+        boolean result = hashLinkService.compareHashLinksFromEntities(dataLocation, originOffChaiEntity);
         // Assert that the expected result is returned
         assertTrue(result);
         // Verify that the createHashFromEntity method was called with the expected parameter
@@ -96,14 +96,13 @@ class HashLinkServiceImplTest {
 
     @Test
      void testCompareHashlinksWithDifferentOnes() throws Exception {
-        // Mock the createHashFromEntity method to return a specific value
-        when(applicationUtils.calculateSHA256Hash(anyString())).thenReturn("different");
         // Call the compareHashlinks method with some input parameters
-        String dataLocation = "https://example.com/entity?hl=mockedHash";
-        String originOffChaiEntity = "This is the entity data";
-        boolean result = hashLinkService.compareHashLinks(dataLocation, originOffChaiEntity);
+        String targetOffChainEntity = "Something";
+        when(applicationUtils.calculateSHA256Hash(targetOffChainEntity)).thenReturn("mockedHash");
+        String originOffChaiEntity = "Another thing";
+        when(applicationUtils.calculateSHA256Hash(originOffChaiEntity)).thenReturn("anothermockedHash");
         // Assert that the expected result is returned
-        assertFalse(result);
+        assertFalse(hashLinkService.compareHashLinksFromEntities(targetOffChainEntity, originOffChaiEntity));
         // Verify that the createHashFromEntity method was called with the expected parameter
         verify(applicationUtils).calculateSHA256Hash(originOffChaiEntity);
     }

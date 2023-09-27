@@ -126,21 +126,4 @@ public class ApplicationUtils {
         return result.toString();
     }
 
-    public String jsonExtractId(String jsonString) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonString);
-            JsonNode idNode = jsonNode.get("id");
-
-            if (idNode != null) {
-                return idNode.asText();
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 }
