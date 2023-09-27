@@ -1,0 +1,75 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id("jacoco")
+	id("org.sonarqube") version "4.0.0.2929"
+}
+
+group = 'es.in2.dome'
+version = '0.0.1'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+
+	// Spring Boot dependencies
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	// JSON
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+	// Spring Boot DevTools
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// OpenAPI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+
+	// Persistence
+	runtimeOnly 'com.h2database:h2'
+
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+	testImplementation 'org.mockito:mockito-core:3.12.4'
+	testImplementation 'io.mockk:mockk:1.13.5'
+
+}
+
+tasks.named('compileJava') {
+	inputs.files(tasks.named('processResources'))
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+}
