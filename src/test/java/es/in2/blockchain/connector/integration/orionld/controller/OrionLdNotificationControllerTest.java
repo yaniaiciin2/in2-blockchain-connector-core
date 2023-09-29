@@ -10,12 +10,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @AutoConfigureMockMvc
@@ -28,17 +24,16 @@ class OrionLdNotificationControllerTest {
 
     @InjectMocks
     private OrionLdNotificationController orionLdNotificationController;
+    WebTestClient webTestClient;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(orionLdNotificationController)
-                .build();
-
+        webTestClient = WebTestClient.bindToController(orionLdNotificationController).build();
     }
 
     @Test
-    void createAndPublishEntityWithValidDatathenReturn200() throws Exception{
+    void createAndPublishEntityWithValidDatathenReturn200() {
 
         String jsonRequest = """
                 {
@@ -328,18 +323,18 @@ class OrionLdNotificationControllerTest {
                 }""";
 
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/notifications/orion-ld")
+        webTestClient.post()
+                .uri("/notifications/orion-ld")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+                .bodyValue(jsonRequest)
+                .exchange()
+                .expectStatus().isOk();
 
     }
 
 
     @Test
-    void createAndPublishEntityWithInvalidDataThenReturn400() throws Exception {
+    void createAndPublishEntityWithInvalidDataThenReturn400() {
         String jsonRequest = "{" +
                 "\"id\":\"urn:ngsi-ld:Notification:b0f522da-489c-11ee-9f5d-0242ac1c0009\"," +
                 "\"type\":\"Notification\"," +
@@ -604,14 +599,14 @@ class OrionLdNotificationControllerTest {
                 "}" +
                 "}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/notifications/orion-ld")
+        webTestClient.post()
+                .uri("/notifications/orion-ld")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andReturn();
+                .bodyValue(jsonRequest)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.BAD_REQUEST);
 
 
-
-        assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
     }
 
 

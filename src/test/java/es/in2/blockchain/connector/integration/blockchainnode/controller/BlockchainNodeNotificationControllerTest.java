@@ -1,30 +1,24 @@
-
 package es.in2.blockchain.connector.integration.blockchainnode.controller;
 
-
-import es.in2.blockchain.connector.core.service.impl.OffChainEntityServiceImpl;
+import es.in2.blockchain.connector.core.service.OffChainEntityService;
+import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
-@AutoConfigureMockMvc
 class BlockchainNodeNotificationControllerTest {
 
-    private MockMvc mockMvc;
+    private WebTestClient webTestClient;
 
     @Mock
-    private OffChainEntityServiceImpl offChainEntityService;
+    private OffChainEntityService offChainEntityService;
 
     @InjectMocks
     private BlockchainNodeNotificationController nodeNotificationController;
@@ -32,13 +26,11 @@ class BlockchainNodeNotificationControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(nodeNotificationController)
-                .build();
+        webTestClient = WebTestClient.bindToController(nodeNotificationController).build();
     }
 
     @Test
-    void retrieveAndPublishEntityToOffChainWithValidDataThenReturn200() throws Exception {
-
+    void retrieveAndPublishEntityToOffChainWithValidDataThenReturn200() {
         String jsonRequest = "{" +
                 "\"id\": {" +
                 "\"type\": \"urn:ngsi-ld:Notification:b0f522da-489c-11ee-9f5d-0242ac1c0009\"" +
@@ -53,36 +45,25 @@ class BlockchainNodeNotificationControllerTest {
                 "\"relevantMetadata\": [\"metadata1\", \"metadata2\"]" +
                 "}";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/notifications/blockchain-node")
+        doNothing().when(offChainEntityService).retrieveAndPublishEntityToOffChain(any(BlockchainNodeNotificationDTO.class));
+
+        webTestClient.post()
+                .uri("/notifications/blockchain-node")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
-
+                .bodyValue(jsonRequest)
+                .exchange()
+                .expectStatus().isOk();
     }
-
 
     @Test
-    void retrieveAndPublishEntityToOffChainWithInvalidDataThenReturn400() throws Exception {
-
+    void retrieveAndPublishEntityToOffChainWithInvalidDataThenReturn400() {
         String jsonRequest = "";
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/notifications/blockchain-node")
+        webTestClient.post()
+                .uri("/notifications/blockchain-node")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest)).andReturn();
-
-        assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus());
-
+                .bodyValue(jsonRequest)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
-
-
-
-
-
-
-
-
-
 }
