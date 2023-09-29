@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -17,9 +18,13 @@ public class BlockchainNodeNotificationController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public void blockchainNodeNotification(@RequestBody BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
+    public Mono<Void> blockchainNodeNotification(@RequestBody Mono<BlockchainNodeNotificationDTO> blockchainNodeNotificationDTO) {
         log.debug(">>> Notification received: {}", blockchainNodeNotificationDTO.toString());
-        offChainEntityService.retrieveAndPublishEntityToOffChain(blockchainNodeNotificationDTO);
+        return blockchainNodeNotificationDTO
+                .flatMap(dto -> {
+                    offChainEntityService.retrieveAndPublishEntityToOffChain(dto);
+                    return Mono.empty();
+                });
     }
 
 }

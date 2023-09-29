@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -17,9 +18,11 @@ public class OrionLdNotificationController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public void orionLdNotification(@RequestBody OrionLdNotificationDTO orionLdNotificationDTO) {
+    public Mono<Void> orionLdNotification(@RequestBody OrionLdNotificationDTO orionLdNotificationDTO) {
         log.debug("Notification received: {}", orionLdNotificationDTO.toString());
-        onChainEntityService.createAndPublishEntityToOnChain(orionLdNotificationDTO);
+
+        return Mono.fromRunnable(() -> onChainEntityService.createAndPublishEntityToOnChain(orionLdNotificationDTO)).then();
     }
+
 
 }
