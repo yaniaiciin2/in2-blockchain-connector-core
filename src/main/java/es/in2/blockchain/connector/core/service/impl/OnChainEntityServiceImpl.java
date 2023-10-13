@@ -2,8 +2,10 @@ package es.in2.blockchain.connector.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
+import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import es.in2.blockchain.connector.core.domain.DomeEvent;
@@ -28,17 +30,21 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
     private final HashLinkService hashLinkService;
     private final BlockchainNodeIConfig blockchainNodeIConfig;
     private final BlockchainNodeProperties blockchainNodeProperties;
+    private final TransactionService transactionService;
 
     @Override
     public void createAndPublishEntityToOnChain(OrionLdNotificationDTO orionLdNotificationDTO) {
         // Create On-Chain Entity DTO
         DomeEvent domeEvent;
+        Transaction transaction;
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
+            transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()));
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
+        transactionService.editTransactionAttribute(transaction.getId(), "CREATED");
         publishDomeEvent(domeEvent);
     }
 

@@ -18,6 +18,7 @@ services:
     networks:
       - local_network
 
+
   provider-orionld-adapter:
     container_name: provider-orionld-adapter
     image: ocanades/orionld-adapter:1.0.0
@@ -119,9 +120,12 @@ services:
 networks:
   local_network:
     driver: bridge
+  connector_external_network:
 
 volumes:
   provider_data:
   provider_db_config:
   marketplace_data:
   marketplace_db_config:
+  CORE_DOME_MYSQL:
+  CORE_DOME_MYSQL_MKT:

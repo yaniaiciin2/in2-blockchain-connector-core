@@ -31,6 +31,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'org.springframework.data:spring-data-envers:3.1.1'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	// JSON
@@ -45,6 +46,9 @@ dependencies {
 
 	// Persistence
 	runtimeOnly 'com.h2database:h2'
+
+	// mysql
+	runtimeOnly("com.mysql:mysql-connector-j")
 
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -2,19 +2,38 @@ spring:
   application:
     name: Blockchain Connector Core
   datasource:
-    url: jdbc:h2:mem:dbtest
-    driver-class-name: org.h2.Driver
+    url: ${DATABASE_URL}
     username: in2admin
     password: in2pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     open-in-view: false
     properties:
+      org:
+          javax:
+            persistence:
+              validation_mode: auto
+          hibernate:
+            dialect: org.hibernate.dialect.MySQL5Dialect
+            envers:
+              enabled: true
+              default_schema: audit
+              audit_table_suffix: _AUD
+              revision_field_name: REV
+              revision_type_field_name: REVTYPE
+              track_entities_changed_in_revision: true
       jakarta.persistence.sharedCache.mode: UNSPECIFIED
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        hbm2ddl:
+          auto: update
     hibernate:
       ddl-auto: update
     show-sql: true
     generate-ddl: true
+    database-platform: org.hibernate.dialect.MySQLDialect
   security:
     user:
       name: in2test

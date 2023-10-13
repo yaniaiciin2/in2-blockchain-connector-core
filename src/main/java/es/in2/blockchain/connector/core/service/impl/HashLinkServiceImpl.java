@@ -84,7 +84,8 @@ public class HashLinkServiceImpl implements HashLinkService {
         }
     }
 
-    private static String extractHashLink(String url) {
+    @Override
+    public String extractHashLink(String url) {
         Pattern pattern = Pattern.compile("hl=([^&]*)");
         Matcher matcher = pattern.matcher(url);
         if (matcher.find()) {
