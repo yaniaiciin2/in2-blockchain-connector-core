@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AuditStatus {
     RECEIVED("RECIEVED"),
-    POST_TO_BLOCKCHAIN("POST TO BLOCKCHAIN"),
-    ERROR("ERROR"),
+    PUBLISHED("PUBLISHED"),
     CREATED("CREATED");
 
     private final String description;

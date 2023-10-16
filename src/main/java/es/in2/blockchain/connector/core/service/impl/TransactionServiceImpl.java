@@ -2,6 +2,7 @@ package es.in2.blockchain.connector.core.service.impl;
 
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.repository.TransactionRepository;
+import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final HashLinkService hashLinkService;
 
     @Override
     public Transaction createTransaction(String entityId, String entityHash, String datalocation) {
@@ -28,16 +30,25 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction editTransactionAttribute(UUID id, String newAttributeValue) {
+    public Transaction editTransactionStatus(UUID id, String newAttributeValue) {
 
-        Transaction existingTransaction = transactionRepository.findById(id);
+        Transaction transactionFound = transactionRepository.findById(id);
+        checkIfTransactionExist(transactionFound);
+        transactionFound.setStatus(newAttributeValue);
+        return transactionRepository.save(transactionFound);
+    }
 
-        if (existingTransaction != null) {
-            existingTransaction.setStatus(newAttributeValue);
-            return transactionRepository.save(existingTransaction);
+    @Override
+    public Transaction editTransactionHash(UUID id, String datalocation) {
+        Transaction transactionFound = transactionRepository.findById(id);
+        checkIfTransactionExist(transactionFound);
+        transactionFound.setEntityHash(hashLinkService.extractHashLink(datalocation));
+        return transactionRepository.save(transactionFound);
+    }
+
+    private void checkIfTransactionExist(Transaction transactionFound) {
+        if (transactionFound == null) {
+            throw new NoSuchElementException("Transaction not found.");
         }
-
-        throw new NoSuchElementException("Transaction not found.");
-
     }
 }

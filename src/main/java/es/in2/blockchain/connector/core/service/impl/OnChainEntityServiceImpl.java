@@ -3,6 +3,7 @@ package es.in2.blockchain.connector.core.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.domain.Transaction;
+import es.in2.blockchain.connector.core.exception.JsonReadingException;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
@@ -38,21 +39,17 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         // Create On-Chain Entity DTO
         DomeEvent domeEvent;
         Transaction transaction;
+        transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), " ", hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)));
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
-            transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()), domeEvent.getDataLocation());
+            transactionService.editTransactionHash(transaction.getId(), domeEvent.getDataLocation());
+            transactionService.editTransactionStatus(transaction.getId(), AuditStatus.CREATED.getDescription());
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
-        transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.CREATED.getDescription());
-        try{
-            publishDomeEvent(domeEvent);
-        } catch(RequestErrorException e) {
-           transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.ERROR.getDescription());
-        }
-
-        transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.POST_TO_BLOCKCHAIN.getDescription());
+        publishDomeEvent(domeEvent);
+        transactionService.editTransactionStatus(transaction.getId(), AuditStatus.PUBLISHED.getDescription());
 
     }
 
@@ -105,4 +102,12 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
 
     }
 
+    private String parseNotificationData(OrionLdNotificationDTO orionLdNotificationDTO) {
+        Map<String, Object> data = orionLdNotificationDTO.getData().get(0);
+        try {
+            return new ObjectMapper().writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new JsonReadingException("Error while processing JSON");
+        }
+    }
 }
