@@ -3,25 +3,25 @@ package es.in2.blockchain.connector.core.service.impl;
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.repository.TransactionRepository;
 import es.in2.blockchain.connector.core.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import es.in2.blockchain.connector.core.utils.AuditStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
-    @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
-    }
+
     @Override
-    public Transaction createTransaction(String entityId, String entityHash) {
+    public Transaction createTransaction(String entityId, String entityHash, String datalocation) {
         Transaction transaction = Transaction.builder()
                 .entityId(entityId)
                 .entityHash(entityHash)
-                .status("RECIEVED")
+                .dataLocation(datalocation)
+                .status(AuditStatus.RECEIVED.getDescription())
                 .build();
 
         return  transactionRepository.save(transaction);

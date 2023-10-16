@@ -4,6 +4,7 @@ package es.in2.blockchain.connector.core.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.UUID;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public class Transaction {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
@@ -28,10 +29,18 @@ public class Transaction {
     private String entityId;
 
     @Audited
+    private String dataLocation;
+
+    @CreatedBy
+    private String createdBy;
+
+    @Audited
     private String status;
 
     @Audited
     private String entityHash;
+
+
 
 
 }

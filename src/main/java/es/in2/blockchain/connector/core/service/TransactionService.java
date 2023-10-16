@@ -6,6 +6,6 @@ import java.util.UUID;
 
 
 public interface TransactionService {
-    Transaction createTransaction(String entityId, String entityHash);
+    Transaction createTransaction(String entityId, String entityHash, String datalocation);
     Transaction editTransactionAttribute(UUID id, String newAttributeValue);
 }

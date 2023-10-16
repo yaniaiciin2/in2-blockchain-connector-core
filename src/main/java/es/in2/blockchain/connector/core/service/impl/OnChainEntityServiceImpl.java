@@ -6,6 +6,7 @@ import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
+import es.in2.blockchain.connector.core.utils.AuditStatus;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import es.in2.blockchain.connector.core.domain.DomeEvent;
@@ -39,13 +40,20 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         Transaction transaction;
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
-            transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()));
+            transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()), domeEvent.getDataLocation());
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
-        transactionService.editTransactionAttribute(transaction.getId(), "CREATED");
-        publishDomeEvent(domeEvent);
+        transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.CREATED.getDescription());
+        try{
+            publishDomeEvent(domeEvent);
+        } catch(RequestErrorException e) {
+           transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.ERROR.getDescription());
+        }
+
+        transactionService.editTransactionAttribute(transaction.getId(), AuditStatus.POST_TO_BLOCKCHAIN.getDescription());
+
     }
 
     private DomeEvent createOnChainEntityDTO(OrionLdNotificationDTO orionLdNotificationDTO) throws JsonProcessingException {
