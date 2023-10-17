@@ -43,7 +43,7 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), " ", hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)));
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
-            transactionService.editTransaction(transaction.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()), EditOperation.HASH);
+            transactionService.editTransaction(transaction.getId(), domeEvent.getDataLocation(), EditOperation.HASH);
             transactionService.editTransaction(transaction.getId(), AuditStatus.CREATED.getDescription(), EditOperation.STATUS);
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
