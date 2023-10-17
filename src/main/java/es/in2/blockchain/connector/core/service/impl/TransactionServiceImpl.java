@@ -35,10 +35,10 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transactionFound = transactionRepository.findById(id);
         checkIfTransactionExist(transactionFound);
 
-        if (operation == EditOperation.STATUS) {
-            transactionFound.setStatus(newAttributeValue);
-        } else if (operation == EditOperation.HASH) {
-            transactionFound.setEntityHash(hashLinkService.extractHashLink(newAttributeValue));
+        switch (operation) {
+            case STATUS -> transactionFound.setStatus(newAttributeValue);
+            case HASH -> transactionFound.setEntityHash(hashLinkService.extractHashLink(newAttributeValue));
+            default -> throw new IllegalArgumentException("Not a valid operation: " + operation);
         }
 
         return transactionRepository.save(transactionFound);
