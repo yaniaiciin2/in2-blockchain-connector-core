@@ -5,12 +5,10 @@ import es.in2.blockchain.connector.core.repository.TransactionRepository;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
-import es.in2.blockchain.connector.core.utils.EditOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +29,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction editTransaction(UUID id, String newAttributeValue, EditOperation operation) {
-        Transaction transactionFound = transactionRepository.findById(id);
+    public Transaction editTransaction(Transaction transaction) {
+        Transaction transactionFound = transactionRepository.findById(transaction.getId());
         checkIfTransactionExist(transactionFound);
-
-        switch (operation) {
-            case STATUS -> transactionFound.setStatus(newAttributeValue);
-            case HASH -> transactionFound.setEntityHash(hashLinkService.extractHashLink(newAttributeValue));
-            default -> throw new IllegalArgumentException("Not a valid operation: " + operation);
-        }
-
-        return transactionRepository.save(transactionFound);
+        return transactionRepository.save(transaction);
     }
 
 

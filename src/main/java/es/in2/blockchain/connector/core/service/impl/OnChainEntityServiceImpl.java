@@ -2,18 +2,17 @@ package es.in2.blockchain.connector.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.in2.blockchain.connector.core.domain.DomeEvent;
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.JsonReadingException;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
+import es.in2.blockchain.connector.core.service.OnChainEntityService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
-import es.in2.blockchain.connector.core.utils.EditOperation;
+import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
-import es.in2.blockchain.connector.core.domain.DomeEvent;
-import es.in2.blockchain.connector.core.service.OnChainEntityService;
-import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,14 +42,16 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), " ", hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)));
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
-            transactionService.editTransaction(transaction.getId(), domeEvent.getDataLocation(), EditOperation.HASH);
-            transactionService.editTransaction(transaction.getId(), AuditStatus.CREATED.getDescription(), EditOperation.STATUS);
+            transaction.setEntityHash(hashLinkService.extractHashLink(domeEvent.getDataLocation()));
+            transaction.setStatus(AuditStatus.CREATED.getDescription());
+            transactionService.editTransaction(transaction);
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
         publishDomeEvent(domeEvent);
-        transactionService.editTransaction(transaction.getId(), AuditStatus.PUBLISHED.getDescription(), EditOperation.STATUS);
+        transaction.setStatus(AuditStatus.PUBLISHED.getDescription());
+        transactionService.editTransaction(transaction);
 
 
     }
