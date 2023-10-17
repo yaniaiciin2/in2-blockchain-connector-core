@@ -5,6 +5,7 @@ import es.in2.blockchain.connector.core.repository.TransactionRepository;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
+import es.in2.blockchain.connector.core.utils.EditOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +31,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction editTransactionStatus(UUID id, String newAttributeValue) {
-
+    public Transaction editTransaction(UUID id, String newAttributeValue, EditOperation operation) {
         Transaction transactionFound = transactionRepository.findById(id);
         checkIfTransactionExist(transactionFound);
-        transactionFound.setStatus(newAttributeValue);
+
+        if (operation == EditOperation.STATUS) {
+            transactionFound.setStatus(newAttributeValue);
+        } else if (operation == EditOperation.HASH) {
+            transactionFound.setEntityHash(hashLinkService.extractHashLink(newAttributeValue));
+        }
+
         return transactionRepository.save(transactionFound);
     }
 
-    @Override
-    public Transaction editTransactionHash(UUID id, String datalocation) {
-        Transaction transactionFound = transactionRepository.findById(id);
-        checkIfTransactionExist(transactionFound);
-        transactionFound.setEntityHash(hashLinkService.extractHashLink(datalocation));
-        return transactionRepository.save(transactionFound);
-    }
 
     private void checkIfTransactionExist(Transaction transactionFound) {
         if (transactionFound == null) {

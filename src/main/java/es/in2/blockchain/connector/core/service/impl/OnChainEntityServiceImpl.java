@@ -8,6 +8,7 @@ import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
+import es.in2.blockchain.connector.core.utils.EditOperation;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import es.in2.blockchain.connector.core.domain.DomeEvent;
@@ -42,14 +43,15 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), " ", hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)));
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
-            transactionService.editTransactionHash(transaction.getId(), domeEvent.getDataLocation());
-            transactionService.editTransactionStatus(transaction.getId(), AuditStatus.CREATED.getDescription());
+            transactionService.editTransaction(transaction.getId(), hashLinkService.extractHashLink(domeEvent.getDataLocation()), EditOperation.HASH);
+            transactionService.editTransaction(transaction.getId(), AuditStatus.CREATED.getDescription(), EditOperation.STATUS);
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
         publishDomeEvent(domeEvent);
-        transactionService.editTransactionStatus(transaction.getId(), AuditStatus.PUBLISHED.getDescription());
+        transactionService.editTransaction(transaction.getId(), AuditStatus.PUBLISHED.getDescription(), EditOperation.STATUS);
+
 
     }
 
