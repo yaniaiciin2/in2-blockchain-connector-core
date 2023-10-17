@@ -2,7 +2,6 @@ package es.in2.blockchain.connector.core.service.impl;
 
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.repository.TransactionRepository;
-import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
-    private final HashLinkService hashLinkService;
 
     @Override
     public Transaction createTransaction(String entityId, String entityHash, String datalocation) {
