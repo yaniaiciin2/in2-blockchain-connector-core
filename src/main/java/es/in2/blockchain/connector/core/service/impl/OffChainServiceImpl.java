@@ -3,7 +3,7 @@ package es.in2.blockchain.connector.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.service.HashLinkService;
-import es.in2.blockchain.connector.core.service.OffChainEntityService;
+import es.in2.blockchain.connector.core.service.OffChainService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
 import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OffChainEntityServiceImpl implements OffChainEntityService {
+public class OffChainServiceImpl implements OffChainService {
 
     private final HashLinkService hashLinkService;
     private final ApplicationUtils applicationUtils;

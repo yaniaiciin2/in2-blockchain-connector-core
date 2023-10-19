@@ -1,6 +1,6 @@
 package es.in2.blockchain.connector.core.service;
 
-import es.in2.blockchain.connector.core.service.impl.OffChainEntityServiceImpl;
+import es.in2.blockchain.connector.core.service.impl.OffChainServiceImpl;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
 import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import static org.mockito.Mockito.*;
 
 
-class OffChainEntityServiceImplTest {
+class OffChainServiceImplTest {
 
     @Mock
     private HashLinkService hashLinkService;
@@ -27,12 +27,12 @@ class OffChainEntityServiceImplTest {
     private OrionLdProperties orionLdProperties;
 
     @InjectMocks
-    private OffChainEntityServiceImpl offChainEntityService;
+    private OffChainServiceImpl offChainEntityService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        offChainEntityService = new OffChainEntityServiceImpl(hashLinkService, applicationUtils, orionLdProperties);
+        offChainEntityService = new OffChainServiceImpl(hashLinkService, applicationUtils, orionLdProperties);
 
     }
 

@@ -1,6 +1,6 @@
 package es.in2.blockchain.connector.integration.blockchainnode.controller;
 
-import es.in2.blockchain.connector.core.service.OffChainEntityService;
+import es.in2.blockchain.connector.core.service.OffChainService;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ class BlockchainNodeNotificationControllerTest {
     private WebTestClient webTestClient;
 
     @Mock
-    private OffChainEntityService offChainEntityService;
+    private OffChainService offChainService;
 
     @InjectMocks
     private BlockchainNodeNotificationController nodeNotificationController;
@@ -45,7 +45,7 @@ class BlockchainNodeNotificationControllerTest {
                 "\"relevantMetadata\": [\"metadata1\", \"metadata2\"]" +
                 "}";
 
-        doNothing().when(offChainEntityService).retrieveAndPublishEntityToOffChain(any(BlockchainNodeNotificationDTO.class));
+        doNothing().when(offChainService).retrieveAndPublishEntityToOffChain(any(BlockchainNodeNotificationDTO.class));
 
         webTestClient.post()
                 .uri("/notifications/blockchain-node")

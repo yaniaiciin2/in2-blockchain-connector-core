@@ -1,7 +1,7 @@
 package es.in2.blockchain.connector.integration.orionld.controller;
 
 
-import es.in2.blockchain.connector.core.service.impl.OnChainEntityServiceImpl;
+import es.in2.blockchain.connector.core.service.impl.OnChainServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,7 +20,7 @@ class OrionLdNotificationControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    OnChainEntityServiceImpl onChainEntityService;
+    OnChainServiceImpl onChainEntityService;
 
     @InjectMocks
     private OrionLdNotificationController orionLdNotificationController;

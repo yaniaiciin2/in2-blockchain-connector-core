@@ -1,6 +1,5 @@
 package es.in2.blockchain.connector.core.domain;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
@@ -39,8 +38,5 @@ public class Transaction {
 
     @Audited
     private String entityHash;
-
-
-
 
 }

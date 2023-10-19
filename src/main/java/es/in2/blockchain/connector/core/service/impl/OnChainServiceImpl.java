@@ -6,11 +6,12 @@ import es.in2.blockchain.connector.core.domain.OnChainEntity;
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
-import es.in2.blockchain.connector.core.service.OnChainEntityService;
-import es.in2.blockchain.connector.core.service.TransactionService;
+import es.in2.blockchain.connector.core.service.OnChainService;
+import es.in2.blockchain.connector.core.service.AuditService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
+import es.in2.blockchain.connector.integration.orionld.domain.OnChainEntityDTO;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdMapper;
 import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import lombok.RequiredArgsConstructor;
@@ -27,33 +28,43 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OnChainEntityServiceImpl implements OnChainEntityService {
+public class OnChainServiceImpl implements OnChainService {
 
     private final HashLinkService hashLinkService;
     private final BlockchainNodeIConfig blockchainNodeIConfig;
     private final BlockchainNodeProperties blockchainNodeProperties;
-    private final TransactionService transactionService;
+    private final AuditService auditService;
 
     @Override
-    public void createAndPublishEntityToOnChain(OrionLdNotificationDTO orionLdNotificationDTO) {
-        // Create transaction
-        Transaction transaction = transactionService.createTransactionFromOrionLdNotification(orionLdNotificationDTO);
-        // Create OnChain Entity
-        OnChainEntity onChainEntity = createOnChainEntity(orionLdNotificationDTO, transaction);
-        // Publish On-Chain Entity DTO (DOME Event) to Blockchain Node Interface
+    public void publishEntityToOnChainSystem(OnChainEntityDTO onChainEntityDTO) {
+        // Create Transaction
+        Transaction transaction = auditService.createTransaction(onChainEntityDTO);
+
+        // Create On Chain Entity
+        OnChainEntity onChainEntity = createOnChainEntity(onChainEntityDTO, transaction);
+
+        // Publish On Chain Entity into On Chain System (Blockchain Node)
         publishOnChainEntityToBlockchainNode(onChainEntity, transaction);
+
     }
 
-    private OnChainEntity createOnChainEntity(OrionLdNotificationDTO orionLdNotificationDTO, Transaction transaction) {
-        try {
-            OnChainEntity onChainEntity = buildOnChainEntityFromOrionLdNotification(orionLdNotificationDTO);
-            transaction.setEntityHash(hashLinkService.extractHashLink(onChainEntity.getDataLocation()));
-            transaction.setStatus(AuditStatus.CREATED.getDescription());
-            transactionService.updateTransaction(transaction);
-            return onChainEntity;
-        } catch (JsonProcessingException e) {
-            throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
-        }
+    private OnChainEntity createOnChainEntity(OnChainEntityDTO onChainEntityDTO, Transaction transaction) {
+        log.debug("Creating On-Chain Entity DTO...");
+        // Create OnChainEntity
+        OnChainEntity onChainEntity = OnChainEntity.builder()
+                .eventType(onChainEntityDTO.getEventType())
+                .dataLocation(hashLinkService.createHashLink(onChainEntityDTO.getId(), onChainEntityDTO.getData()))
+                // todo: the metadata will be added in the next features
+                .metadata(List.of("metadata1", "metadata2"))
+                .build();
+        log.debug(">>> On-Chain Entity DTO: {}", onChainEntity.toString());
+        log.debug("On-Chain Entity DTO created successfully.");
+        // Update Transaction
+        transaction.setEntityHash(hashLinkService.extractHashLink(onChainEntity.getDataLocation()));
+        transaction.setStatus(AuditStatus.CREATED.getDescription());
+        auditService.updateTransaction(transaction);
+        // Return OnChainEntity
+        return onChainEntity;
     }
 
     private void publishOnChainEntityToBlockchainNode(OnChainEntity onChainEntity, Transaction transaction) {
@@ -81,12 +92,11 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
             checkPublishResponse(response);
             // Update Transaction if it is successfully
             transaction.setStatus(AuditStatus.PUBLISHED.getDescription());
-            transactionService.updateTransaction(transaction);
+            auditService.updateTransaction(transaction);
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RequestErrorException("Error sending request to blockchain node: " + e.getMessage());
         }
-
     }
 
     private void checkPublishResponse(HttpResponse<String> response) {
@@ -95,22 +105,6 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
         } else {
             throw new RequestErrorException("Error sending request to blockchain node");
         }
-    }
-
-    private OnChainEntity buildOnChainEntityFromOrionLdNotification(OrionLdNotificationDTO orionLdNotificationDTO)
-            throws JsonProcessingException {
-        log.debug("Creating On-Chain Entity DTO...");
-        // Get data
-        Map<String, Object> dataMap = new OrionLdMapper().getDataMapFromOrionLdNotification(orionLdNotificationDTO);
-        // Create OnChainEntity
-        OnChainEntity onChainEntity = OnChainEntity.builder()
-                .eventType(dataMap.get("type").toString())
-                .dataLocation(hashLinkService.createHashlinkFromOrionLdNotification(orionLdNotificationDTO))
-                .metadata(List.of("metadata1", "metadata2"))
-                .build();
-        log.debug(">>> On-Chain Entity DTO: {}", onChainEntity.toString());
-        log.debug("On-Chain Entity DTO created successfully.");
-        return onChainEntity;
     }
 
 }

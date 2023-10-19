@@ -57,19 +57,6 @@ public class HashLinkServiceImpl implements HashLinkService {
         return retrievedEntityHash.equals(originEntityHash);
     }
 
-    @Override
-    public String createHashlinkFromOrionLdNotification(OrionLdNotificationDTO orionLdNotificationDTO)
-            throws JsonProcessingException {
-        OrionLdMapper orionLdMapper = new OrionLdMapper();
-        // Get data as Map
-        Map<String, Object> dataMap = orionLdMapper.getDataMapFromOrionLdNotification(orionLdNotificationDTO);
-        // Get data as String
-        String data = orionLdMapper.getDataStringFromOrionLdNotification(orionLdNotificationDTO);
-        String id = dataMap.get("id").toString();
-        // create hashlink
-        return createHashLink(id, data);
-    }
-
     private String executeHashlinkRequest(String dataLocation) {
         String offChainEntityOriginUrl = extractOffChainEntityOriginUrl(dataLocation);
         return applicationUtils.getRequest(offChainEntityOriginUrl);

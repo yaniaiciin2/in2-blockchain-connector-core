@@ -1,6 +1,6 @@
 package es.in2.blockchain.connector.integration.blockchainnode.controller;
 
-import es.in2.blockchain.connector.core.service.OffChainEntityService;
+import es.in2.blockchain.connector.core.service.OffChainService;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,18 +14,17 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BlockchainNodeNotificationController {
 
-    private final OffChainEntityService offChainEntityService;
+    private final OffChainService offChainService;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Mono<Void> blockchainNodeNotification(@RequestBody BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
+    public Mono<Void> blockchainNodeNotification(@RequestBody Mono<BlockchainNodeNotificationDTO> blockchainNodeNotificationDTO) {
         log.debug(">>> Notification received: {}", blockchainNodeNotificationDTO.toString());
-
-        return Mono.defer(() -> {
-            offChainEntityService.retrieveAndPublishEntityToOffChain(blockchainNodeNotificationDTO);
-            return Mono.empty();
-        });
+        return blockchainNodeNotificationDTO
+                .flatMap(dto -> {
+                    offChainService.retrieveAndPublishEntityToOffChain(dto);
+                    return Mono.empty();
+                });
     }
-
 
 }
