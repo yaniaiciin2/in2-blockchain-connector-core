@@ -6,9 +6,9 @@ import es.in2.blockchain.connector.core.domain.DomeEvent;
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.JsonReadingException;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
+import es.in2.blockchain.connector.core.repository.TransactionRepository;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.OnChainEntityService;
-import es.in2.blockchain.connector.core.service.TransactionService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
@@ -23,6 +23,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -32,26 +33,28 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
     private final HashLinkService hashLinkService;
     private final BlockchainNodeIConfig blockchainNodeIConfig;
     private final BlockchainNodeProperties blockchainNodeProperties;
-    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public void createAndPublishEntityToOnChain(OrionLdNotificationDTO orionLdNotificationDTO) {
         // Create On-Chain Entity DTO
         DomeEvent domeEvent;
         Transaction transaction;
-        transaction = transactionService.createTransaction(orionLdNotificationDTO.getId(), " ", hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)));
+        transaction = buildTransaction(orionLdNotificationDTO);
+        persistTransaction(transaction);
+
         try {
             domeEvent = createOnChainEntityDTO(orionLdNotificationDTO);
             transaction.setEntityHash(hashLinkService.extractHashLink(domeEvent.getDataLocation()));
             transaction.setStatus(AuditStatus.CREATED.getDescription());
-            transactionService.editTransaction(transaction);
+            editPersistedTransaction(transaction);
         } catch (JsonProcessingException e) {
             throw new RequestErrorException("Error creating On-Chain Entity DTO: " + e.getMessage());
         }
         // Publish On-Chain Entity DTO to Blockchain Node Interface
         publishDomeEvent(domeEvent);
         transaction.setStatus(AuditStatus.PUBLISHED.getDescription());
-        transactionService.editTransaction(transaction);
+        editPersistedTransaction(transaction);
 
 
     }
@@ -103,6 +106,31 @@ public class OnChainEntityServiceImpl implements OnChainEntityService {
             throw new RequestErrorException("Error sending request to blockchain node");
         }
 
+    }
+
+    private Transaction buildTransaction(OrionLdNotificationDTO orionLdNotificationDTO) {
+        return Transaction.builder()
+                .entityId(orionLdNotificationDTO.getId())
+                .entityHash(" ")
+                .dataLocation(hashLinkService.createHashLink(orionLdNotificationDTO.getId(),parseNotificationData(orionLdNotificationDTO)))
+                .status(AuditStatus.RECEIVED.getDescription())
+                .build();
+    }
+
+    private void persistTransaction(Transaction transaction) {
+        transactionRepository.save(transaction);
+    }
+
+    private void editPersistedTransaction(Transaction transaction) {
+        Transaction transactionFound = transactionRepository.findById(transaction.getId());
+        checkIfTransactionExist(transactionFound);
+        persistTransaction(transaction);
+    }
+
+    private void checkIfTransactionExist(Transaction transactionFound) {
+        if (transactionFound == null) {
+            throw new NoSuchElementException("Transaction not found.");
+        }
     }
 
     private String parseNotificationData(OrionLdNotificationDTO orionLdNotificationDTO) {
