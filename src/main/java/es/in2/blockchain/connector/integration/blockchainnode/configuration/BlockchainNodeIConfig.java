@@ -100,7 +100,7 @@ public class BlockchainNodeIConfig {
             log.debug(" > Blockchain Node I/F Subscription url: {}", url);
 
             BlockchainNodeSubscriptionDTO blockchainNodeSubscriptionDTO = new BlockchainNodeSubscriptionDTO(
-                    blockchainNodeProperties.getSubscriptionEventType(),
+                    blockchainNodeProperties.getSubscriptionEventTypeList(),
                     blockchainNodeProperties.getSubscriptionNotificationEndpointUri());
             String body = new ObjectMapper().writeValueAsString(blockchainNodeSubscriptionDTO);
             log.debug(" > Blockchain Node I/F Subscription body: {}", body);

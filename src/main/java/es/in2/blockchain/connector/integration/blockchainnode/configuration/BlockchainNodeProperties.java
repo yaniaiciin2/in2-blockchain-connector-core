@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Getter
 @Component
 public class BlockchainNodeProperties {
@@ -23,8 +25,8 @@ public class BlockchainNodeProperties {
     @Value("${blockchain-node-if.subscription.notification-endpoint-uri}")
     private String subscriptionNotificationEndpointUri;
 
-    @Value("${blockchain-node-if.subscription.event-type}")
-    private String subscriptionEventType;
+    @Value("${blockchain-node-if.subscription.event-types}")
+    private List<String> subscriptionEventTypeList;
 
     @Value("${blockchain-node-if.node.rpcAddress}")
     private String nodeRpcAddress;
