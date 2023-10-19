@@ -1,16 +1,20 @@
 package es.in2.blockchain.connector.core.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import es.in2.blockchain.connector.core.exception.HashLinkException;
 import es.in2.blockchain.connector.core.exception.InvalidHashlinkComparisonException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils;
 import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
+import es.in2.blockchain.connector.integration.orionld.domain.OrionLdMapper;
+import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +29,12 @@ public class HashLinkServiceImpl implements HashLinkService {
     @Override
     public String createHashLink(String id, String data) {
         log.debug(" > Creating hashlink...");
-        log.debug(" > Data: " + data);
-        String resourceHash = createHashFromEntity(data);
+        // Generate hash from data
+        String generatedHash = generateHashFromString(data);
+        // Build dynamic URL by Orion-LD Use Case
         String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities();
-        return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + resourceHash;
+        // Create Hashlink
+        return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + generatedHash;
     }
 
     @Override
@@ -44,11 +50,24 @@ public class HashLinkServiceImpl implements HashLinkService {
 
     @Override
     public boolean compareHashLinksFromEntities(String retrievedEntity, String originOffChainEntity) {
-        String originEntityHash = createHashFromEntity(retrievedEntity);
+        String originEntityHash = generateHashFromString(retrievedEntity);
         log.debug(" > Origin entity hash: " + originEntityHash);
-        String retrievedEntityHash = createHashFromEntity(originOffChainEntity);
+        String retrievedEntityHash = generateHashFromString(originOffChainEntity);
         log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
         return retrievedEntityHash.equals(originEntityHash);
+    }
+
+    @Override
+    public String createHashlinkFromOrionLdNotification(OrionLdNotificationDTO orionLdNotificationDTO)
+            throws JsonProcessingException {
+        OrionLdMapper orionLdMapper = new OrionLdMapper();
+        // Get data as Map
+        Map<String, Object> dataMap = orionLdMapper.getDataMapFromOrionLdNotification(orionLdNotificationDTO);
+        // Get data as String
+        String data = orionLdMapper.getDataStringFromOrionLdNotification(orionLdNotificationDTO);
+        String id = dataMap.get("id").toString();
+        // create hashlink
+        return createHashLink(id, data);
     }
 
     private String executeHashlinkRequest(String dataLocation) {
@@ -59,16 +78,16 @@ public class HashLinkServiceImpl implements HashLinkService {
     private void verifyHashlink(String dataLocation, String originOffChaiEntity) {
         String originEntityHash = extractHashLink(dataLocation);
         log.debug(" > Origin entity hash: " + originEntityHash);
-        String retrievedEntityHash = createHashFromEntity(originOffChaiEntity);
+        String retrievedEntityHash = generateHashFromString(originOffChaiEntity);
         log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
         if (!retrievedEntityHash.equals(originEntityHash)) {
             throw new InvalidHashlinkComparisonException("Invalid hash: Origin entity hash is different than Retrieved entity");
         }
     }
 
-    private String createHashFromEntity(String entityData) {
+    private String generateHashFromString(String data) {
         try {
-            return applicationUtils.calculateSHA256Hash(entityData);
+            return applicationUtils.calculateSHA256Hash(data);
         } catch (NoSuchAlgorithmException e) {
             throw new HashLinkException("Error creating Hashlink");
         }
@@ -84,7 +103,8 @@ public class HashLinkServiceImpl implements HashLinkService {
         }
     }
 
-    private static String extractHashLink(String url) {
+    @Override
+    public String extractHashLink(String url) {
         Pattern pattern = Pattern.compile("hl=([^&]*)");
         Matcher matcher = pattern.matcher(url);
         if (matcher.find()) {

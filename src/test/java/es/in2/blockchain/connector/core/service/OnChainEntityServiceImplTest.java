@@ -1,6 +1,7 @@
 package es.in2.blockchain.connector.core.service;
 
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
+import es.in2.blockchain.connector.core.repository.TransactionRepository;
 import es.in2.blockchain.connector.core.service.impl.OnChainEntityServiceImpl;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
@@ -30,13 +31,16 @@ import static org.mockito.Mockito.when;
     @Mock
     private BlockchainNodeProperties blockchainNodeProperties;
 
+    @Mock
+    private TransactionService transactionService;
+
     @InjectMocks
     private OnChainEntityServiceImpl onChainEntityService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        onChainEntityService = new OnChainEntityServiceImpl(hashLinkService, blockchainNodeIConfig, blockchainNodeProperties);
+        onChainEntityService = new OnChainEntityServiceImpl(hashLinkService, blockchainNodeIConfig, blockchainNodeProperties, transactionService);
     }
 
     @Test

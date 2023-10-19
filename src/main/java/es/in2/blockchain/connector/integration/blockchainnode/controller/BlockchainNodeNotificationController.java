@@ -18,13 +18,14 @@ public class BlockchainNodeNotificationController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Mono<Void> blockchainNodeNotification(@RequestBody Mono<BlockchainNodeNotificationDTO> blockchainNodeNotificationDTO) {
+    public Mono<Void> blockchainNodeNotification(@RequestBody BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
         log.debug(">>> Notification received: {}", blockchainNodeNotificationDTO.toString());
-        return blockchainNodeNotificationDTO
-                .flatMap(dto -> {
-                    offChainEntityService.retrieveAndPublishEntityToOffChain(dto);
-                    return Mono.empty();
-                });
+
+        return Mono.defer(() -> {
+            offChainEntityService.retrieveAndPublishEntityToOffChain(blockchainNodeNotificationDTO);
+            return Mono.empty();
+        });
     }
+
 
 }

@@ -1,6 +1,5 @@
 package es.in2.blockchain.connector.core.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,24 +34,6 @@ public class ApplicationUtils {
         // Verify Response HttpStatus
         checkGetResponse(response);
         return response.thenApply(HttpResponse::body).join();
-    }
-
-    public String getRequestCode(String url) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
-        // Send request asynchronously
-        CompletableFuture<HttpResponse<String>> response =
-                client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        // Verify Response HttpStatus
-        return getRequestResponseCode(response);
-
-    }
-
-    private String getRequestResponseCode(CompletableFuture<HttpResponse<String>> response) {
-        return response.thenApply(HttpResponse::statusCode).join().toString();
     }
 
     public void patchRequest(String url, String requestBody) {
