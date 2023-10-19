@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DomeEvent {
+public class OnChainEntity {
 
     @JsonProperty("eventType")
     private String eventType;

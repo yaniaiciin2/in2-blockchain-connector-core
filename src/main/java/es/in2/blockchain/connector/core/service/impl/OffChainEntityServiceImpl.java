@@ -25,27 +25,19 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
     @Override
     public void retrieveAndPublishEntityToOffChain(BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
         log.info(">>> Retrieving and publishing entity to off-chain...");
-
         String dataLocation = blockchainNodeNotificationDTO.getDataLocation();
         log.debug(" > Data Location: {}", dataLocation);
-
         String retrievedEntity = hashLinkService.resolveHashlink(dataLocation);
-
         try{
             String entityId = getIdFromOrionLdEntity(retrievedEntity);
             String existingEntity = retrieveExistingOrionLdEntity(entityId);
             log.debug("> Entity exists");
             compareAndPublishEntities(existingEntity, retrievedEntity);
-
         } catch(NoSuchElementException e) {
-
             publishEntityToDestinationOffChain(retrievedEntity);
             log.info("  > Entity published to off-chain");
-
         }
     }
-
-
 
     private String buildOrionLdEntityUrl(String entityId) {
         return orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/" + entityId;
@@ -56,7 +48,6 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             JsonNode idNode = jsonNode.get("id");
-
             if (idNode != null) {
                 return idNode.asText();
             } else {
@@ -72,7 +63,6 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
         String orionLdEntitiesUrl = buildOrionLdEntityUrl(entityId);
         return applicationUtils.getRequest(orionLdEntitiesUrl);
     }
-
 
     private void publishEntityToDestinationOffChain(String retrievedEntity) {
         String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities();
@@ -92,10 +82,8 @@ public class OffChainEntityServiceImpl implements OffChainEntityService {
             String retrievedEntityUrl = buildOrionLdEntityUrl(retrievedEntityId) + "/attrs";
             applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity);
             log.info("  > Entity updated to off-chain");
-
         } else {
             log.info("> Same entities. No changes.");
-
         }
     }
 

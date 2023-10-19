@@ -1,5 +1,6 @@
 package es.in2.blockchain.connector.core.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

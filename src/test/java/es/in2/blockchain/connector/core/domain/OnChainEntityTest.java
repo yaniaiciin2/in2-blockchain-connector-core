@@ -6,7 +6,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DomeEventTest {
+class OnChainEntityTest {
 
     @Test
     void testDomeEventToString() {
@@ -15,10 +15,10 @@ class DomeEventTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        DomeEvent domeEvent = new DomeEvent(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
 
         // Act
-        String result = domeEvent.toString();
+        String result = onChainEntity.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = [meta1, meta2]}";
@@ -32,10 +32,10 @@ class DomeEventTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = List.of();
 
-        DomeEvent domeEvent = new DomeEvent(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
 
         // Act
-        String result = domeEvent.toString();
+        String result = onChainEntity.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = []}";
@@ -48,10 +48,10 @@ class DomeEventTest {
         String eventType = "SampleEvent";
         String dataLocation = "/path/to/data";
 
-        DomeEvent domeEvent = new DomeEvent(eventType, dataLocation, null);
+        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, null);
 
         // Act
-        String result = domeEvent.toString();
+        String result = onChainEntity.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = null}";
@@ -65,12 +65,12 @@ class DomeEventTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        DomeEvent domeEvent = new DomeEvent(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
 
         // Act
-        String actualEventType = domeEvent.getEventType();
-        String actualDataLocation = domeEvent.getDataLocation();
-        List<String> actualMetadata = domeEvent.getMetadata();
+        String actualEventType = onChainEntity.getEventType();
+        String actualDataLocation = onChainEntity.getDataLocation();
+        List<String> actualMetadata = onChainEntity.getMetadata();
 
         // Assert
         assertEquals(eventType, actualEventType);

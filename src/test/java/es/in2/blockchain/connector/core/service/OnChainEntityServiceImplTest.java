@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
     private BlockchainNodeProperties blockchainNodeProperties;
 
     @Mock
-    private TransactionRepository transactionRepository;
+    private TransactionService transactionService;
 
     @InjectMocks
     private OnChainEntityServiceImpl onChainEntityService;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        onChainEntityService = new OnChainEntityServiceImpl(hashLinkService, blockchainNodeIConfig, blockchainNodeProperties, transactionRepository);
+        onChainEntityService = new OnChainEntityServiceImpl(hashLinkService, blockchainNodeIConfig, blockchainNodeProperties, transactionService);
     }
 
     @Test
