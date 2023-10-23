@@ -43,6 +43,10 @@ public class OffChainServiceImpl implements OffChainService {
         return orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/" + entityId;
     }
 
+    private String buildOrionLdUpdateEntityUrl() {
+        return orionLdProperties.getOrionLdDomain() + orionLdProperties.getApiPathUpdate();
+    }
+
     private String getIdFromOrionLdEntity(String jsonString) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -78,8 +82,7 @@ public class OffChainServiceImpl implements OffChainService {
     private void compareAndPublishEntities(String existingEntity, String retrievedEntity) {
         if(!areEntitiesEqual(retrievedEntity, existingEntity)) {
             log.debug("> Entities not equal");
-            String retrievedEntityId = getIdFromOrionLdEntity(retrievedEntity);
-            String retrievedEntityUrl = buildOrionLdEntityUrl(retrievedEntityId) + "/attrs";
+            String retrievedEntityUrl = buildOrionLdUpdateEntityUrl();
             applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity);
             log.info("  > Entity updated to off-chain");
         } else {

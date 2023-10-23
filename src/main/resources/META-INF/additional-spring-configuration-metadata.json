@@ -21,6 +21,11 @@
       "description": "Subscription name used to build the subscription ID."
     },
     {
+      "name": "orion-ld-if.api.path.update",
+      "type": "java.lang.String",
+      "description": "The path to the update API"
+    },
+    {
       "name": "orion-ld-if.subscription.entities",
       "type": "java.util.List",
       "description": "The list of entities to subscribe to."

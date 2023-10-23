@@ -2,6 +2,7 @@ package es.in2.blockchain.connector.integration.orionld.controller;
 
 
 import es.in2.blockchain.connector.core.service.impl.OnChainServiceImpl;
+import es.in2.blockchain.connector.integration.orionld.service.OrionLdNotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,16 +12,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.servlet.MockMvc;
 
 
 @AutoConfigureMockMvc
 class OrionLdNotificationControllerTest {
-
-    private MockMvc mockMvc;
+    @Mock
+    private OnChainServiceImpl onChainEntityService;
 
     @Mock
-    OnChainServiceImpl onChainEntityService;
+    private OrionLdNotificationService orionLdNotificationService;
 
     @InjectMocks
     private OrionLdNotificationController orionLdNotificationController;
@@ -328,7 +328,7 @@ class OrionLdNotificationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(jsonRequest)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isEqualTo(HttpStatus.OK);
 
     }
 
