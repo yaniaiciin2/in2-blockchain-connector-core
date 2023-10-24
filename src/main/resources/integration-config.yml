@@ -12,6 +12,7 @@ orion-ld-if:
     path:
       subscription: /api/v1/subscriptions
       entities: /api/v1/publish
+      update: /api/v1/update
   subscription:
     type: "Subscription"
     notification-endpoint-uri: http://sp-blockchain-connector-core:8080/notifications/orion-ld

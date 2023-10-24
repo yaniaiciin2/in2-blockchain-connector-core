@@ -25,6 +25,9 @@ public class OrionLdProperties {
     @Value("${orion-ld-if.api.path.entities}")
     private String apiPathEntities;
 
+    @Value("{orion-ld-if.api.path.update}")
+    private String apiPathUpdate;
+
     @Value("${orion-ld-if.subscription.type}")
     private String subscriptionType;
 

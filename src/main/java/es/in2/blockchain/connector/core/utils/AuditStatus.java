@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AuditStatus {
-    RECEIVED("RECIEVED"),
+    RECEIVED("RECEIVED"),
     PUBLISHED("PUBLISHED"),
     CREATED("CREATED");
 
