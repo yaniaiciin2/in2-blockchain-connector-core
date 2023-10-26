@@ -40,11 +40,11 @@ public class OffChainServiceImpl implements OffChainService {
     }
 
     private String buildOrionLdEntityUrl(String entityId) {
-        return orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/" + entityId;
+        return orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities() + "/" + entityId;
     }
 
     private String buildOrionLdUpdateEntityUrl() {
-        return orionLdProperties.getOrionLdDomain() + orionLdProperties.getApiPathUpdate();
+        return orionLdProperties.getApiDomain() + orionLdProperties.getApiPathUpdate();
     }
 
     private String getIdFromOrionLdEntity(String jsonString) {
@@ -69,7 +69,7 @@ public class OffChainServiceImpl implements OffChainService {
     }
 
     private void publishEntityToDestinationOffChain(String retrievedEntity) {
-        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities();
+        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathPublish();
         log.debug(" > Publishing entity to: {}", orionLdEntitiesUrl);
         log.debug(" > Entity to publish: {}", retrievedEntity);
         applicationUtils.postRequest(orionLdEntitiesUrl, retrievedEntity);

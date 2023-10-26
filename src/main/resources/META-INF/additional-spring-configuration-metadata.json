@@ -23,7 +23,12 @@
     {
       "name": "orion-ld-if.api.path.update",
       "type": "java.lang.String",
-      "description": "The path to the update API"
+      "description": "The path to the update API."
+    },
+    {
+      "name": "orion-ld-if.api.path.publish",
+      "type": "java.lang.String",
+      "description": "The path to the publish API."
     },
     {
       "name": "orion-ld-if.subscription.entities",

@@ -1,20 +1,16 @@
 package es.in2.blockchain.connector.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import es.in2.blockchain.connector.core.exception.HashLinkException;
 import es.in2.blockchain.connector.core.exception.InvalidHashlinkComparisonException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils;
 import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdMapper;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,10 +25,11 @@ public class HashLinkServiceImpl implements HashLinkService {
     @Override
     public String createHashLink(String id, String data) {
         log.debug(" > Creating hashlink...");
+        log.debug(data);
         // Generate hash from data
         String generatedHash = generateHashFromString(data);
         // Build dynamic URL by Orion-LD Use Case
-        String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities();
+        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities();
         // Create Hashlink
         return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + generatedHash;
     }
@@ -66,6 +63,7 @@ public class HashLinkServiceImpl implements HashLinkService {
         String originEntityHash = extractHashLink(dataLocation);
         log.debug(" > Origin entity hash: " + originEntityHash);
         String retrievedEntityHash = generateHashFromString(originOffChaiEntity);
+        log.debug(originOffChaiEntity);
         log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
         if (!retrievedEntityHash.equals(originEntityHash)) {
             throw new InvalidHashlinkComparisonException("Invalid hash: Origin entity hash is different than Retrieved entity");

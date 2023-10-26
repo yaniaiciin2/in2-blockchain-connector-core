@@ -7,11 +7,13 @@ import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificatio
 import es.in2.blockchain.connector.integration.orionld.exception.OrionLdParserException;
 import es.in2.blockchain.connector.integration.orionld.service.OrionLdNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrionLdNotificationServiceImpl implements OrionLdNotificationService {
 
@@ -22,10 +24,11 @@ public class OrionLdNotificationServiceImpl implements OrionLdNotificationServic
         try {
             // Get data
             Map<String, Object> dataMap = orionLdNotificationDTO.getData().get(0);
+            log.debug(new ObjectMapper().writeValueAsString(dataMap));
             OnChainEntityDTO onChainEntityDTO = OnChainEntityDTO.builder()
                     .id(dataMap.get("id").toString())
                     .eventType(dataMap.get("type").toString())
-                    .data(new ObjectMapper().writeValueAsString(dataMap.get("data")))
+                    .data(new ObjectMapper().writeValueAsString(dataMap))
                     .build();
             // Send OnChainEntityDTO to OnChainService to be published into the OnChainSystem
             onChainService.publishEntityToOnChainSystem(onChainEntityDTO);

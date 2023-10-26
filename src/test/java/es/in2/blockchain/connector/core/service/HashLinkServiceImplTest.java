@@ -38,8 +38,8 @@ class HashLinkServiceImplTest {
         String data = "sampleData";
         String expectedHashlink = "https://example.com/entities/sampleId?hl=sampleHash";
 
-        when(orionLdProperties.getOrionLdDomain()).thenReturn("https://example.com");
-        when(orionLdProperties.getOrionLdPathEntities()).thenReturn("/entities");
+        when(orionLdProperties.getApiDomain()).thenReturn("https://example.com");
+        when(orionLdProperties.getApiPathEntities()).thenReturn("/entities");
         when(applicationUtils.calculateSHA256Hash(data)).thenReturn("sampleHash");
 
         // Act
