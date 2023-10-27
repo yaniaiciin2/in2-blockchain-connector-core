@@ -1,20 +1,16 @@
 package es.in2.blockchain.connector.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import es.in2.blockchain.connector.core.exception.HashLinkException;
 import es.in2.blockchain.connector.core.exception.InvalidHashlinkComparisonException;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils;
-import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdMapper;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
+import es.in2.blockchain.connector.integration.orionld.configuration.BrokerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +19,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class HashLinkServiceImpl implements HashLinkService {
 
-    private final OrionLdProperties orionLdProperties;
+    private final BrokerProperties brokerProperties;
     private final ApplicationUtils applicationUtils;
 
     @Override
@@ -32,7 +28,7 @@ public class HashLinkServiceImpl implements HashLinkService {
         // Generate hash from data
         String generatedHash = generateHashFromString(data);
         // Build dynamic URL by Orion-LD Use Case
-        String orionLdEntitiesUrl = orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities();
+        String orionLdEntitiesUrl = brokerProperties.externalDomain() + brokerProperties.paths().entities();
         // Create Hashlink
         return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + generatedHash;
     }

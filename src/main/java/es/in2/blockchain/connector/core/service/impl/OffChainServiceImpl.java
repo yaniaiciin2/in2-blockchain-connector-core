@@ -6,7 +6,7 @@ import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.OffChainService;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
-import es.in2.blockchain.connector.integration.orionld.configuration.OrionLdProperties;
+import es.in2.blockchain.connector.integration.orionld.configuration.BrokerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class OffChainServiceImpl implements OffChainService {
 
     private final HashLinkService hashLinkService;
     private final ApplicationUtils applicationUtils;
-    private final OrionLdProperties orionLdProperties;
+    private final BrokerProperties brokerProperties;
 
     @Override
     public void retrieveAndPublishEntityToOffChain(BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
@@ -40,11 +40,11 @@ public class OffChainServiceImpl implements OffChainService {
     }
 
     private String buildOrionLdEntityUrl(String entityId) {
-        return orionLdProperties.getOrionLdDomain() + orionLdProperties.getOrionLdPathEntities() + "/" + entityId;
+        return brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + entityId;
     }
 
     private String buildOrionLdUpdateEntityUrl() {
-        return orionLdProperties.getOrionLdDomain() + orionLdProperties.getApiPathUpdate();
+        return brokerProperties.internalDomain() + brokerProperties.paths().entities();
     }
 
     private String getIdFromOrionLdEntity(String jsonString) {
@@ -69,7 +69,7 @@ public class OffChainServiceImpl implements OffChainService {
     }
 
     private void publishEntityToDestinationOffChain(String retrievedEntity) {
-        String orionLdEntitiesUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathEntities();
+        String orionLdEntitiesUrl = brokerProperties.internalDomain() + brokerProperties.paths().entities();
         log.debug(" > Publishing entity to: {}", orionLdEntitiesUrl);
         log.debug(" > Entity to publish: {}", retrievedEntity);
         applicationUtils.postRequest(orionLdEntitiesUrl, retrievedEntity);

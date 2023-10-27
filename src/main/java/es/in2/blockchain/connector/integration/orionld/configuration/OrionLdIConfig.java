@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.ACCEPT_HEADER;
 import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.APPLICATION_JSON_HEADER;
 import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.CONTENT_HEADER;
 
@@ -26,7 +27,8 @@ import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.CO
 @RequiredArgsConstructor
 public class OrionLdIConfig {
 
-    private final OrionLdProperties orionLdProperties;
+    private final OrionLdAdapterProperties orionLdAdapterProperties;
+    private final NgsiLdSubscriptionConfiguration subscriptionConfiguration;
 
     @Bean
     @Profile("!default")
@@ -37,13 +39,13 @@ public class OrionLdIConfig {
         OrionLdSubscriptionDTO orionLdSubscriptionDTO = OrionLdSubscriptionDTO.builder()
                 .id("urn:ngsi-ld:Subscription:" + UUID.randomUUID())
                 .type("Subscription")
-                .notificationEndpointUri(orionLdProperties.getSubscriptionNotificationEndpointUri())
-                .entities(orionLdProperties.getSubscriptionEntities())
+                .notificationEndpointUri(subscriptionConfiguration.notificationEndpoint())
+                .entities(subscriptionConfiguration.entityTypes())
                 .build();
         log.debug(" > Orion-LD Subscription: {}", orionLdSubscriptionDTO.toString());
 
         try {
-            String orionLdInterfaceUrl = orionLdProperties.getApiDomain() + orionLdProperties.getApiPathSubscription();
+            String orionLdInterfaceUrl = orionLdAdapterProperties.domain() + orionLdAdapterProperties.paths().subscribe();
             log.debug(" > Orion-LD Subscription URL: {}", orionLdInterfaceUrl);
 
             String requestBody = new ObjectMapper().writeValueAsString(orionLdSubscriptionDTO);
@@ -53,7 +55,7 @@ public class OrionLdIConfig {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(orionLdInterfaceUrl))
-                    .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER)
+                    .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 

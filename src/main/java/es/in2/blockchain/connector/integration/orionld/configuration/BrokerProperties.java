@@ -1,0 +1,18 @@
+package es.in2.blockchain.connector.integration.orionld.configuration;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
+
+import java.util.Optional;
+
+@ConfigurationProperties(prefix = "broker")
+public record BrokerProperties(String externalDomain, String internalDomain, @NestedConfigurationProperty BrokerPathProperties paths) {
+
+	@ConstructorBinding
+	public BrokerProperties(String externalDomain, String internalDomain, BrokerPathProperties paths) {
+		this.externalDomain = externalDomain;
+		this.internalDomain = internalDomain;
+		this.paths = Optional.ofNullable(paths).orElse(new BrokerPathProperties(null, null));
+	}
+}

@@ -1,19 +1,16 @@
 package es.in2.blockchain.connector.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.domain.OnChainEntity;
 import es.in2.blockchain.connector.core.domain.Transaction;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
+import es.in2.blockchain.connector.core.service.AuditService;
 import es.in2.blockchain.connector.core.service.HashLinkService;
 import es.in2.blockchain.connector.core.service.OnChainService;
-import es.in2.blockchain.connector.core.service.AuditService;
 import es.in2.blockchain.connector.core.utils.AuditStatus;
 import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeIConfig;
-import es.in2.blockchain.connector.integration.blockchainnode.configuration.BlockchainNodeProperties;
+import es.in2.blockchain.connector.integration.orionld.configuration.DLTAdapterProperties;
 import es.in2.blockchain.connector.integration.orionld.domain.OnChainEntityDTO;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdMapper;
-import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +20,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -32,7 +28,7 @@ public class OnChainServiceImpl implements OnChainService {
 
     private final HashLinkService hashLinkService;
     private final BlockchainNodeIConfig blockchainNodeIConfig;
-    private final BlockchainNodeProperties blockchainNodeProperties;
+    private final DLTAdapterProperties dltAdapterProperties;
     private final AuditService auditService;
 
     @Override
@@ -72,7 +68,7 @@ public class OnChainServiceImpl implements OnChainService {
         HttpResponse<String> response;
         try {
             // Create URI
-            URI uri = URI.create(blockchainNodeProperties.getApiDomain() + blockchainNodeProperties.getApiPathPublish());
+            URI uri = URI.create(dltAdapterProperties.domain() + dltAdapterProperties.paths().publish());
             log.debug(">>> URI: {}", uri);
             // Build Request Body
             String requestBody = new ObjectMapper().writeValueAsString(onChainEntity);

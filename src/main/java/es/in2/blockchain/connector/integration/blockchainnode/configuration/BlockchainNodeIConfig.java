@@ -6,6 +6,7 @@ import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeDTO;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeSubscriptionDTO;
 import es.in2.blockchain.connector.integration.blockchainnode.exception.BlockchainNodeSubscriptionException;
+import es.in2.blockchain.connector.integration.orionld.configuration.DLTAdapterProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,8 @@ import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.CO
 @RequiredArgsConstructor
 public class BlockchainNodeIConfig {
 
-    private final BlockchainNodeProperties blockchainNodeProperties;
+    private final BlockchainProperties blockchainProperties;
+    private final DLTAdapterProperties dltAdapterProperties;
 
     @Bean
     @Profile("!default")
@@ -61,7 +63,7 @@ public class BlockchainNodeIConfig {
     @Bean
     @Profile("!default")
     public void setDefaultSubscriptions() {
-        if(blockchainNodeProperties.isSubscriptionActive()) {
+        if(blockchainProperties.subscription().active()) {
             try {
                 createDefaultSubscriptionToBlockchainNodeInterface();
             } catch (Exception e) {
@@ -76,11 +78,11 @@ public class BlockchainNodeIConfig {
         log.info(">>> Creating blockchain node configuration...");
 
         try {
-            String url = blockchainNodeProperties.getApiDomain() + blockchainNodeProperties.getApiPathConfigureNode();
+            String url = dltAdapterProperties.domain() + dltAdapterProperties.paths().configureNode();
             log.debug(" > Blockchain Node Configuration url: {}", url);
 
-            BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(blockchainNodeProperties.getNodeRpcAddress(),
-                    blockchainNodeProperties.getNodeUserEthereumAddress());
+            BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(blockchainProperties.rpcAddress(),
+                    blockchainProperties.userEthereumAddress());
             String body = new ObjectMapper().writeValueAsString(blockchainNodeDTO);
             log.debug(" > Blockchain Node Configuration: {}", body);
 
@@ -96,12 +98,12 @@ public class BlockchainNodeIConfig {
         log.info(">>> Creating default subscription to blockchain node interface...");
 
         try {
-            String url = blockchainNodeProperties.getApiDomain() + blockchainNodeProperties.getApiPathSubscribe();
+            String url = dltAdapterProperties.domain() + dltAdapterProperties.paths().subscribe();
             log.debug(" > Blockchain Node I/F Subscription url: {}", url);
 
             BlockchainNodeSubscriptionDTO blockchainNodeSubscriptionDTO = new BlockchainNodeSubscriptionDTO(
-                    blockchainNodeProperties.getSubscriptionEventTypeList(),
-                    blockchainNodeProperties.getSubscriptionNotificationEndpointUri());
+                    blockchainProperties.subscription().eventTypes(),
+                    blockchainProperties.subscription().notificationEndpoint());
             String body = new ObjectMapper().writeValueAsString(blockchainNodeSubscriptionDTO);
             log.debug(" > Blockchain Node I/F Subscription body: {}", body);
 
