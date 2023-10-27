@@ -6,6 +6,11 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.util.Optional;
 
+/**
+ * Configuration to connect the dtl-adapter at
+ * @param domain - domain of the adapter
+ * @param paths - paths to be used with the adapter instance
+ */
 @ConfigurationProperties(prefix = "dlt-adapter")
 public record DLTAdapterProperties(String domain, @NestedConfigurationProperty DLTAdapterPathProperties paths) {
 

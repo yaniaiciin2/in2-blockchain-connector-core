@@ -6,6 +6,11 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.util.Optional;
 
+/**
+ * Configuration to connect with the orion-ld-adapter.
+ * @param domain - domain of the adapter
+ * @param paths - paths to be used with that adapter instance
+ */
 @ConfigurationProperties(prefix = "orion-ld-adapter")
 public record OrionLdAdapterProperties(String domain, @NestedConfigurationProperty OrionLdAdapterPathProperties paths) {
 

@@ -4,6 +4,11 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.util.Optional;
 
+/**
+ * NGSI-LD Paths
+ * @param entities - entities path
+ * @param subscriptions - subscriptions path
+ */
 public record BrokerPathProperties(String entities, String subscriptions) {
 
 	@ConstructorBinding
