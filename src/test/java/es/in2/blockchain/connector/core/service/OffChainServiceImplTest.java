@@ -1,5 +1,8 @@
 package es.in2.blockchain.connector.core.service;
 
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import es.in2.blockchain.connector.core.service.impl.OffChainServiceImpl;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
 import es.in2.blockchain.connector.integration.blockchainnode.domain.BlockchainNodeNotificationDTO;
@@ -33,8 +36,10 @@ class OffChainServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
+		ObjectMapper objectMapper = JsonMapper.builder().configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+				.build();
 		MockitoAnnotations.openMocks(this);
-		offChainEntityService = new OffChainServiceImpl(hashLinkService, applicationUtils,
+		offChainEntityService = new OffChainServiceImpl(objectMapper, hashLinkService, applicationUtils,
 				new BrokerProperties("https://example.com", "http://orion-ld:1026",
 						new BrokerPathProperties("/entities", "/subscriptions")));
 

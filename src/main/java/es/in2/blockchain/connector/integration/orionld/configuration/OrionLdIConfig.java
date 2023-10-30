@@ -27,52 +27,54 @@ import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.CO
 @RequiredArgsConstructor
 public class OrionLdIConfig {
 
-    private final OrionLdAdapterProperties orionLdAdapterProperties;
-    private final NgsiLdSubscriptionConfiguration subscriptionConfiguration;
+	private final OrionLdAdapterProperties orionLdAdapterProperties;
+	private final NgsiLdSubscriptionConfiguration subscriptionConfiguration;
+	private final ObjectMapper objectMapper;
 
-    @Bean
-    @Profile("!default")
-    public void setDefaultOrionLdSubscription() {
+	@Bean
+	@Profile("!default")
+	public void setDefaultOrionLdSubscription() {
 
-        log.info(">>> Setting Orion-LD Entities subscription...");
+		log.info(">>> Setting Orion-LD Entities subscription...");
 
-        OrionLdSubscriptionDTO orionLdSubscriptionDTO = OrionLdSubscriptionDTO.builder()
-                .id("urn:ngsi-ld:Subscription:" + UUID.randomUUID())
-                .type("Subscription")
-                .notificationEndpointUri(subscriptionConfiguration.notificationEndpoint())
-                .entities(subscriptionConfiguration.entityTypes())
-                .build();
-        log.debug(" > Orion-LD Subscription: {}", orionLdSubscriptionDTO.toString());
+		OrionLdSubscriptionDTO orionLdSubscriptionDTO = OrionLdSubscriptionDTO.builder()
+				.id("urn:ngsi-ld:Subscription:" + UUID.randomUUID())
+				.type("Subscription")
+				.notificationEndpointUri(subscriptionConfiguration.notificationEndpoint())
+				.entities(subscriptionConfiguration.entityTypes())
+				.build();
+		log.debug(" > Orion-LD Subscription: {}", orionLdSubscriptionDTO.toString());
 
-        try {
-            String orionLdInterfaceUrl = orionLdAdapterProperties.domain() + orionLdAdapterProperties.paths().subscribe();
-            log.debug(" > Orion-LD Subscription URL: {}", orionLdInterfaceUrl);
+		try {
+			String orionLdInterfaceUrl = orionLdAdapterProperties.domain() + orionLdAdapterProperties.paths()
+					.subscribe();
+			log.debug(" > Orion-LD Subscription URL: {}", orionLdInterfaceUrl);
 
-            String requestBody = new ObjectMapper().writeValueAsString(orionLdSubscriptionDTO);
-            log.debug(" > Orion-LD Subscription request body: {}", requestBody);
+			String requestBody = objectMapper.writer().writeValueAsString(orionLdSubscriptionDTO);
+			log.debug(" > Orion-LD Subscription request body: {}", requestBody);
 
-            // Create request
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(orionLdInterfaceUrl))
-                    .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .build();
+			// Create request
+			HttpClient client = HttpClient.newHttpClient();
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(orionLdInterfaceUrl))
+					.headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
+					.POST(HttpRequest.BodyPublishers.ofString(requestBody))
+					.build();
 
-            // Send request asynchronously
-            CompletableFuture<HttpResponse<String>> response =
-                    client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+			// Send request asynchronously
+			CompletableFuture<HttpResponse<String>> response =
+					client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
-            // Verify Response HttpStatus
-            if (response.get().statusCode() != 200) {
-                throw new CommunicationException("Error creating default subscription");
-            }
+			// Verify Response HttpStatus
+			if (response.get().statusCode() != 200) {
+				throw new CommunicationException("Error creating default subscription");
+			}
 
-            log.info(" > Orion-LD Entities subscription created successfully.");
-        } catch (CommunicationException | InterruptedException | ExecutionException | JsonProcessingException e) {
-            log.error("Error creating default subscription", e);
-            Thread.currentThread().interrupt();
-        }
-    }
+			log.info(" > Orion-LD Entities subscription created successfully.");
+		} catch (CommunicationException | InterruptedException | ExecutionException | JsonProcessingException e) {
+			log.error("Error creating default subscription", e);
+			Thread.currentThread().interrupt();
+		}
+	}
 
 }

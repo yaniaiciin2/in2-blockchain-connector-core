@@ -1,5 +1,8 @@
 package es.in2.blockchain.connector.core.service;
 
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import es.in2.blockchain.connector.core.exception.InvalidHashlinkComparisonException;
 import es.in2.blockchain.connector.core.service.impl.HashLinkServiceImpl;
 import es.in2.blockchain.connector.core.utils.ApplicationUtils;
@@ -31,8 +34,10 @@ class HashLinkServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
+		ObjectMapper objectMapper = JsonMapper.builder().configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+				.build();
 		hashLinkService = new HashLinkServiceImpl(new BrokerProperties("https://example.com", "http://orion-ld:1026",
-				new BrokerPathProperties("/entities", "/subscriptions")), applicationUtils);
+				new BrokerPathProperties("/entities", "/subscriptions")), applicationUtils, objectMapper);
 	}
 
 	@Test

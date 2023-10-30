@@ -31,6 +31,7 @@ public class BlockchainNodeIConfig {
 
     private final BlockchainProperties blockchainProperties;
     private final DLTAdapterProperties dltAdapterProperties;
+    private final ObjectMapper objectMapper;
 
     @Bean
     @Profile("!default")
@@ -83,7 +84,7 @@ public class BlockchainNodeIConfig {
 
             BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(blockchainProperties.rpcAddress(),
                     blockchainProperties.userEthereumAddress());
-            String body = new ObjectMapper().writeValueAsString(blockchainNodeDTO);
+            String body = objectMapper.writer().writeValueAsString(blockchainNodeDTO);
             log.debug(" > Blockchain Node Configuration: {}", body);
 
             requestCall(URI.create(url), body);
@@ -104,7 +105,7 @@ public class BlockchainNodeIConfig {
             BlockchainNodeSubscriptionDTO blockchainNodeSubscriptionDTO = new BlockchainNodeSubscriptionDTO(
                     blockchainProperties.subscription().eventTypes(),
                     blockchainProperties.subscription().notificationEndpoint());
-            String body = new ObjectMapper().writeValueAsString(blockchainNodeSubscriptionDTO);
+            String body = objectMapper.writer().writeValueAsString(blockchainNodeSubscriptionDTO);
             log.debug(" > Blockchain Node I/F Subscription body: {}", body);
 
             requestCall(URI.create(url), body);
