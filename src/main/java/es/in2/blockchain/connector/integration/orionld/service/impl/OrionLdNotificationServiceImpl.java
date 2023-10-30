@@ -7,25 +7,29 @@ import es.in2.blockchain.connector.integration.orionld.domain.OrionLdNotificatio
 import es.in2.blockchain.connector.integration.orionld.exception.OrionLdParserException;
 import es.in2.blockchain.connector.integration.orionld.service.OrionLdNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrionLdNotificationServiceImpl implements OrionLdNotificationService {
 
     private final OnChainService onChainService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void processNotification(OrionLdNotificationDTO orionLdNotificationDTO) {
         try {
             // Get data
             Map<String, Object> dataMap = orionLdNotificationDTO.getData().get(0);
+            String dataToPersist = objectMapper.writer().writeValueAsString(dataMap);
             OnChainEntityDTO onChainEntityDTO = OnChainEntityDTO.builder()
                     .id(dataMap.get("id").toString())
                     .eventType(dataMap.get("type").toString())
-                    .data(new ObjectMapper().writeValueAsString(dataMap.get("data")))
+                    .data(dataToPersist)
                     .build();
             // Send OnChainEntityDTO to OnChainService to be published into the OnChainSystem
             onChainService.publishEntityToOnChainSystem(onChainEntityDTO);

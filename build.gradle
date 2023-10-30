@@ -47,6 +47,9 @@ dependencies {
 	// Persistence
 	runtimeOnly 'com.h2database:h2'
 
+	//db migration
+	implementation 'org.flywaydb:flyway-core:9.16.3'
+
 	// mysql
 	runtimeOnly("com.mysql:mysql-connector-j")
 

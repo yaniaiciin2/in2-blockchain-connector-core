@@ -1,6 +1,5 @@
 package es.in2.blockchain.connector.core.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
+import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.ACCEPT_HEADER;
 import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.APPLICATION_JSON_HEADER;
+import static es.in2.blockchain.connector.core.utils.BlockchainConnectorUtils.CONTENT_HEADER;
 
 @Slf4j
 @Component
@@ -26,6 +27,7 @@ public class ApplicationUtils {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
+                .headers(ACCEPT_HEADER, APPLICATION_JSON_HEADER)
                 .GET()
                 .build();
         // Send request asynchronously
@@ -41,7 +43,7 @@ public class ApplicationUtils {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .headers("Content-Type", "application/json")
+                .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))  // Use PATCH method
                 .build();
         // Send request asynchronously
@@ -70,7 +72,7 @@ public class ApplicationUtils {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .headers(BlockchainConnectorUtils.CONTENT_HEADER, APPLICATION_JSON_HEADER)
+                .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
         // Send request asynchronously
