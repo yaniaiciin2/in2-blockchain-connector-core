@@ -34,7 +34,7 @@ public class OffChainServiceImpl implements OffChainService {
 			String entityId = getIdFromOrionLdEntity(retrievedEntity);
 			String existingEntity = retrieveExistingOrionLdEntity(entityId);
 			log.debug("> Entity exists");
-			compareAndPublishEntities(existingEntity, retrievedEntity);
+			compareAndPublishEntities(entityId, existingEntity, retrievedEntity);
 		} catch (NoSuchElementException e) {
 			publishEntityToDestinationOffChain(retrievedEntity);
 			log.info("  > Entity published to off-chain");
@@ -80,15 +80,16 @@ public class OffChainServiceImpl implements OffChainService {
 		return hashLinkService.compareHashLinksFromEntities(retrievedEntity, existingEntity);
 	}
 
-	private void compareAndPublishEntities(String existingEntity, String retrievedEntity) {
+	private void compareAndPublishEntities(String entityId, String existingEntity, String retrievedEntity) {
 		if (!areEntitiesEqual(retrievedEntity, existingEntity)) {
 			log.debug("> Entities not equal");
-			String retrievedEntityUrl = buildOrionLdUpdateEntityUrl();
+			String retrievedEntityUrl = buildOrionLdEntityUrl(entityId);
 			applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity);
 			log.info("  > Entity updated to off-chain");
 		} else {
 			log.info("> Same entities. No changes.");
 		}
 	}
+
 
 }
