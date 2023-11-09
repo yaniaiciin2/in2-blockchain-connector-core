@@ -11,6 +11,7 @@ import es.in2.blockchain.connector.integration.orionld.configuration.BrokerPrope
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
@@ -26,62 +27,72 @@ public class HashLinkServiceImpl implements HashLinkService {
 	private final ObjectMapper objectMapper;
 
 	@Override
-	public String createHashLink(String id, String data) {
-		log.debug(" > Creating hashlink...");
-		// Generate hash from data
-		String generatedHash = generateHashFromString(data);
-		// Build dynamic URL by Orion-LD Use Case
-		String orionLdEntitiesUrl = brokerProperties.externalDomain() + brokerProperties.paths().entities();
-		// Create Hashlink
-		return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + generatedHash;
+	public Mono<String> createHashLink(String id, String data) {
+		return generateHashFromString(data).map(generatedHash -> {
+			log.debug(" > Creating hashlink...");
+			// Build dynamic URL by Orion-LD Use Case
+			String orionLdEntitiesUrl = brokerProperties.externalDomain() + brokerProperties.paths().entities();
+			// Create Hashlink
+			return orionLdEntitiesUrl + "/" + id + BlockchainConnectorUtils.HASHLINK_PARAMETER + generatedHash;
+		});
 	}
 
 	@Override
-	public String resolveHashlink(String dataLocation) {
+	public Mono<String> resolveHashlink(String dataLocation) {
 		log.debug(" > Resolving hashlink...");
-		// execute hashlink request to get entity from origin off-chain
-		String retrievedEntity = executeHashlinkRequest(dataLocation);
-		// verify entity with hashlink
-		verifyHashlink(dataLocation, retrievedEntity);
-		log.debug(" > Hashlink resolved.");
-		return retrievedEntity;
+		return executeHashlinkRequest(dataLocation)
+				.flatMap(retrievedEntity -> verifyHashlink(dataLocation, retrievedEntity).thenReturn(retrievedEntity))
+				.doOnSuccess(retrievedEntity -> log.debug(" > Hashlink resolved."));
 	}
+
 
 	@Override
-	public boolean compareHashLinksFromEntities(String retrievedEntity, String originOffChainEntity) {
-		String originEntityHash = generateHashFromString(retrievedEntity);
-		log.debug(" > Origin entity hash: " + originEntityHash);
-		String retrievedEntityHash = generateHashFromString(originOffChainEntity);
-		log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
-		return retrievedEntityHash.equals(originEntityHash);
+	public Mono<Boolean> compareHashLinksFromEntities(String retrievedEntity, String originOffChainEntity) {
+		return generateHashFromString(retrievedEntity)
+				.flatMap(retrievedEntityHash -> generateHashFromString(originOffChainEntity)
+						.map(retrievedEntityHash::equals)
+				);
 	}
 
-	private String executeHashlinkRequest(String dataLocation) {
-		String offChainEntityOriginUrl = extractOffChainEntityOriginUrl(dataLocation);
-		return applicationUtils.getRequest(offChainEntityOriginUrl);
+
+	private Mono<String> executeHashlinkRequest(String dataLocation) {
+		return Mono.defer(() -> {
+			String offChainEntityOriginUrl = extractOffChainEntityOriginUrl(dataLocation);
+			return Mono.fromSupplier(() -> applicationUtils.getRequest(offChainEntityOriginUrl));
+		});
 	}
 
-	private void verifyHashlink(String dataLocation, String originOffChaiEntity) {
-		String originEntityHash = extractHashLink(dataLocation);
-		log.debug(" > Origin entity hash: " + originEntityHash);
-		String retrievedEntityHash = generateHashFromString(originOffChaiEntity);
-		log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
-		if (!retrievedEntityHash.equals(originEntityHash)) {
-			throw new InvalidHashlinkComparisonException(
-					"Invalid hash: Origin entity hash is different than Retrieved entity");
-		}
+	private Mono<Void> verifyHashlink(String dataLocation, String originOffChainEntity) {
+		return extractHashLink(dataLocation)
+				.flatMap(originEntityHash -> generateHashFromString(originOffChainEntity)
+						.flatMap(retrievedEntityHash -> {
+							log.debug(" > Origin entity hash: " + originEntityHash);
+							log.debug(" > Retrieved entity hash: " + retrievedEntityHash);
+							if (!retrievedEntityHash.equals(originEntityHash)) {
+								return Mono.error(new InvalidHashlinkComparisonException(
+										"Invalid hash: Origin entity hash is different than Retrieved entity"));
+							} else {
+								return Mono.empty();
+							}
+						})
+				)
+				.then();
 	}
+
 
 	// the string to hash is a json-object. Therefor, it needs preprocessing to produce reliable results, since json does
 	// not guarantee the order of properties.
-	private String generateHashFromString(String jsonData) {
-		try {
-			log.info("Create hash from {}", jsonData);
-			return applicationUtils.calculateSHA256Hash(createOrderedString(jsonData));
-		} catch (NoSuchAlgorithmException e) {
-			throw new HashLinkException("Error creating Hashlink");
-		}
+	private Mono<String> generateHashFromString(String jsonData) {
+		return Mono.fromSupplier(() -> {
+			try {
+				log.info("Create hash from {}", jsonData);
+				return applicationUtils.calculateSHA256Hash(createOrderedString(jsonData));
+			} catch (NoSuchAlgorithmException e) {
+				throw new HashLinkException("Error creating Hashlink");
+			}
+		});
 	}
+
 
 	private String createOrderedString(String jsonData) {
 		try {
@@ -105,14 +116,17 @@ public class HashLinkServiceImpl implements HashLinkService {
 	}
 
 	@Override
-	public String extractHashLink(String url) {
-		Pattern pattern = Pattern.compile("hl=([^&]*)");
-		Matcher matcher = pattern.matcher(url);
-		if (matcher.find()) {
-			return matcher.group(1);
-		} else {
-			throw new IllegalArgumentException("Invalid Path");
-		}
+	public Mono<String> extractHashLink(String url) {
+		return Mono.fromSupplier(() -> {
+			Pattern pattern = Pattern.compile("hl=([^&]*)");
+			Matcher matcher = pattern.matcher(url);
+			if (matcher.find()) {
+				return matcher.group(1);
+			} else {
+				throw new IllegalArgumentException("Invalid Path");
+			}
+		});
 	}
+
 
 }

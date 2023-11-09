@@ -15,7 +15,10 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = OnChainEntity.builder()
+                .eventType(eventType)
+                .dataLocation(dataLocation)
+                .metadata(metadata).build();
 
         // Act
         String result = onChainEntity.toString();
@@ -32,7 +35,11 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = List.of();
 
-        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = OnChainEntity.builder()
+                .eventType(eventType)
+                .dataLocation(dataLocation)
+                .metadata(metadata).build();
+
 
         // Act
         String result = onChainEntity.toString();
@@ -48,7 +55,11 @@ class OnChainEntityTest {
         String eventType = "SampleEvent";
         String dataLocation = "/path/to/data";
 
-        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, null);
+        OnChainEntity onChainEntity = OnChainEntity.builder()
+                .eventType(eventType)
+                .dataLocation(dataLocation)
+                .metadata(null).build();
+
 
         // Act
         String result = onChainEntity.toString();
@@ -65,7 +76,11 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        OnChainEntity onChainEntity = new OnChainEntity(eventType, dataLocation, metadata);
+        OnChainEntity onChainEntity = OnChainEntity.builder()
+                .eventType(eventType)
+                .dataLocation(dataLocation)
+                .metadata(metadata).build();
+
 
         // Act
         String actualEventType = onChainEntity.getEventType();

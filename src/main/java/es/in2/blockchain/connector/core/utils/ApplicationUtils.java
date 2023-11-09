@@ -2,7 +2,11 @@ package es.in2.blockchain.connector.core.utils;
 
 import es.in2.blockchain.connector.core.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,19 +42,23 @@ public class ApplicationUtils {
         return response.thenApply(HttpResponse::body).join();
     }
 
-    public void patchRequest(String url, String requestBody) {
-        // Create request
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .headers(CONTENT_HEADER, APPLICATION_JSON_HEADER, ACCEPT_HEADER, APPLICATION_JSON_HEADER)
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))  // Use PATCH method
+    public Mono<Void> patchRequest(String url, String requestBody) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl(url)
                 .build();
-        // Send request asynchronously
-        CompletableFuture<HttpResponse<String>> response =
-                client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        // Verify Response HttpStatus
-        checkResponse(response);
+
+        return webClient
+                .method(HttpMethod.PATCH)
+                .body(BodyInserters.fromValue(requestBody))
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is2xxSuccessful()) {
+                        return Mono.empty();
+                    } else {
+                        return response.bodyToMono(String.class)
+                                .flatMap(errorBody -> Mono.error(new RequestErrorException("Error making PATCH request: " + errorBody)));
+                    }
+                })
+                .then(); // Convert to Mono<Void>
     }
 
     private void checkGetResponse(CompletableFuture<HttpResponse<String>> response) {

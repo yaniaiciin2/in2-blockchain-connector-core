@@ -17,7 +17,7 @@ public record OrionLdAdapterProperties(String domain, @NestedConfigurationProper
 	@ConstructorBinding
 	public OrionLdAdapterProperties(String domain, OrionLdAdapterPathProperties paths) {
 		this.domain = domain;
-		this.paths = Optional.ofNullable(paths).orElse(new OrionLdAdapterPathProperties(null, null));
+		this.paths = Optional.ofNullable(paths).orElse(new OrionLdAdapterPathProperties(null, null, null));
 	}
 }
 

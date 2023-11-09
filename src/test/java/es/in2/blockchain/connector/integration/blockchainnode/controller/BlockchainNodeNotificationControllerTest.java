@@ -9,9 +9,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 class BlockchainNodeNotificationControllerTest {
 
@@ -45,7 +46,8 @@ class BlockchainNodeNotificationControllerTest {
                 "\"relevantMetadata\": [\"metadata1\", \"metadata2\"]" +
                 "}";
 
-        doNothing().when(offChainService).retrieveAndPublishEntityToOffChain(any(BlockchainNodeNotificationDTO.class));
+        when(offChainService.retrieveAndPublishEntityToOffChain(any(BlockchainNodeNotificationDTO.class)))
+                .thenReturn(Mono.empty());
 
         webTestClient.post()
                 .uri("/notifications/blockchain-node")

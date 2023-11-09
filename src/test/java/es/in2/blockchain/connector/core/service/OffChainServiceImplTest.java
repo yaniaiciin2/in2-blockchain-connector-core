@@ -10,17 +10,13 @@ import es.in2.blockchain.connector.integration.orionld.configuration.BrokerPathP
 import es.in2.blockchain.connector.integration.orionld.configuration.BrokerProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class OffChainServiceImplTest {
 
@@ -81,12 +77,15 @@ class OffChainServiceImplTest {
 				    "  }\\n" +
 				    "}";"""; // Retrieved entity data
 		String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
+		Mono <String> monoRetrieved = Mono.just(retrievedEntity);
 
-		when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
+		when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(monoRetrieved);
 		when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn("existingEntity");
+		when(hashLinkService.compareHashLinksFromEntities(any(), any())).thenReturn(Mono.just(false));
+
 
 		// Act
-		offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
+		offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation)).block();
 
 		// Assert
 		verify(applicationUtils, times(1)).patchRequest(any(), any());
@@ -129,9 +128,9 @@ class OffChainServiceImplTest {
 				}"""; // Retrieved entity data
 		String orionLdEntitiesUrl = "exampleOrionLdEntitiesUrl";
 
-		when(hashLinkService.resolveHashlink(any())).thenReturn(retrievedEntity);
+		when(hashLinkService.resolveHashlink(any())).thenReturn(Mono.just(retrievedEntity));
 		when(applicationUtils.getRequest(orionLdEntitiesUrl)).thenReturn(retrievedEntity);
-		when(hashLinkService.compareHashLinksFromEntities(any(), any())).thenReturn(true);
+		when(hashLinkService.compareHashLinksFromEntities(any(), any())).thenReturn(Mono.just(true));
 
 		// Act
 		offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
@@ -178,11 +177,11 @@ class OffChainServiceImplTest {
 				  }
 				}""";
 
-		when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(retrievedEntity);
+		when(hashLinkService.resolveHashlink(dataLocation)).thenReturn(Mono.just(retrievedEntity));
 		when(applicationUtils.getRequest(any())).thenThrow(NoSuchElementException.class);
 
 		// Act
-		offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation));
+		offChainEntityService.retrieveAndPublishEntityToOffChain(createNotification(dataLocation)).block();
 
 		// Assert
 		verify(applicationUtils, times(1)).postRequest(any(), any());

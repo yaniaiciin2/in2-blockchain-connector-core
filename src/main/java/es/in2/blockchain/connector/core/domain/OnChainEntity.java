@@ -14,6 +14,9 @@ public class OnChainEntity {
     @JsonProperty("eventType")
     private String eventType;
 
+    @JsonProperty("iss")
+    private String organizationId;
+
     @JsonProperty("dataLocation")
     private String dataLocation;
 

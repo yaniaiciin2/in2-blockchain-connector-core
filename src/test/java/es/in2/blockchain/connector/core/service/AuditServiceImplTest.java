@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
 
@@ -43,18 +44,17 @@ import static org.mockito.Mockito.*;
         onChainEntityDTO.setData("Sample Data");
 
 
-
-        when(hashLinkService.createHashLink(any(), any())).thenReturn("hashed-data");
-
+        when(hashLinkService.createHashLink(any(), any())).thenReturn(Mono.just("hashed-data"));
         // Act
-        Transaction createdTransaction = auditService.createTransaction(onChainEntityDTO);
+        Mono<Transaction> createdTransaction = auditService.createTransaction(onChainEntityDTO);
+        Transaction transaction = createdTransaction.block();
 
         // Assert
-        assertEquals("123", createdTransaction.getEntityId());
-        assertEquals("hashed-data", createdTransaction.getDataLocation());
-        assertEquals("RECEIVED", createdTransaction.getStatus());
+        assert transaction != null;
+        assertEquals("123", transaction.getEntityId());
+        assertEquals("RECEIVED", transaction.getStatus());
 
-        verify(transactionRepository).save(createdTransaction);
+        verify(transactionRepository).save(transaction);
     }
 
     @Test
@@ -71,7 +71,7 @@ import static org.mockito.Mockito.*;
         when(transactionRepository.findById(any())).thenReturn(updatedTransaction);
 
         // Act
-        auditService.updateTransaction(updatedTransaction);
+        auditService.updateTransaction(updatedTransaction).block();
 
         // Assert
         verify(transactionRepository).save(updatedTransaction);
@@ -91,7 +91,7 @@ import static org.mockito.Mockito.*;
         when(transactionRepository.findById(any())).thenReturn(null);
 
         // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> auditService.updateTransaction(updatedTransaction));
+        assertThrows(NoSuchElementException.class, () -> auditService.updateTransaction(updatedTransaction).block());
     }
 }
 

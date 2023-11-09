@@ -32,7 +32,7 @@ public class OrionLdIConfig {
 	private final ObjectMapper objectMapper;
 
 	@Bean
-	@Profile("!default")
+	@Profile("default")
 	public void setDefaultOrionLdSubscription() {
 
 		log.info(">>> Setting Orion-LD Entities subscription...");
