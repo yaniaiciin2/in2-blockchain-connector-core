@@ -87,6 +87,7 @@ public class OffChainServiceImpl implements OffChainService {
 		return hashLinkService.compareHashLinksFromEntities(retrievedEntity, existingEntity);
 	}
 
+
 	private Mono<Void> compareAndPublishEntities(String existingEntity, String retrievedEntity) {
 		return areEntitiesEqual(retrievedEntity, existingEntity)
 				.flatMap(isTrue -> {
