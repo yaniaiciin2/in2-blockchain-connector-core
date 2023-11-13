@@ -14,11 +14,13 @@ import javax.sql.DataSource;
 @EnableJpaAuditing
 public class JpaConfig {
 
+    private static final String PACKAGE_TO_SCAN = "es.in2.blockchainconnector.core.domain";
+
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         localContainerEntityManagerFactoryBean.setDataSource(dataSource);
-        localContainerEntityManagerFactoryBean.setPackagesToScan("es.in2.blockchain.connector.core.domain");
+        localContainerEntityManagerFactoryBean.setPackagesToScan(PACKAGE_TO_SCAN);
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         localContainerEntityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
         return localContainerEntityManagerFactoryBean;
