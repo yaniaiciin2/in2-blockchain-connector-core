@@ -2,6 +2,10 @@
 spring:
   application:
     name: Blockchain Connector
+  config:
+    import:
+      - classpath:external-config.yml
+      - file:/src/main/resources/external-config.yml
   datasource:
     url: ${DATABASE_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -58,57 +62,3 @@ springdoc:
 # Server Configuration
 server:
   port: 8080
-
-# Application Configuration
-blockchain-connector:
-  openapi:
-    url: http://localhost:8080
-
-# Operator Configuration
-operator:
-  organization:
-    id: ${ORGANIZATION_ID}
-
-# DLT Adapter Configuration
-dlt-adapter:
-  domain: http://localhost:8080
-
-# Blockchain Configuration
-blockchain:
-  rpcAddress: https://red-t.alastria.io/v0/9461d9f4292b41230527d57ee90652a6
-  userEthereumAddress: "0xb794f5ea0ba39494ce839613fffba74279579268"
-  subscription:
-    active: false
-    notificationEndpoint: http://blockchain-connector-core:8080/notifications/dlt
-    entityTypes: >
-      ProductOffering
-
-# Broker Adapter Configuration
-broker-adapter:
-  domain: http://localhost:8080
-
-# Context Broker Configuration
-broker:
-  externalDomain: https://kong.dome-marketplace.org/scorpio
-  internalDomain: http://scorpio:1026
-
-# NGSI Subscription Configuration
-ngsi-subscription:
-  notificationEndpoint: http://localhost:8080/notifications/broker
-  entityTypes: >
-    ProductOffering
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
