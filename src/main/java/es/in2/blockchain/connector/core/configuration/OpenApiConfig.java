@@ -14,7 +14,7 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${app.openapi.dev-url}")
+    @Value("${app.openapi.url}")
     private String devUrl;
 
     @Bean

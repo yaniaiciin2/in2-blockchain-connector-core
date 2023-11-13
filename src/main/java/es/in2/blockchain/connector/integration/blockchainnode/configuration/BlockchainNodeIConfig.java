@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
 import java.net.CookieManager;
@@ -34,7 +33,6 @@ public class BlockchainNodeIConfig {
     private final ObjectMapper objectMapper;
 
     @Bean
-    @Profile("!default")
     public CookieManager cookieManager() {
         CookieManager cookieManager = new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
@@ -42,7 +40,6 @@ public class BlockchainNodeIConfig {
     }
 
     @Bean
-    @Profile("!default")
     public HttpClient blockchainNodeInterfaceHttpClient() {
         // Create a single HttpClient instance with a CookieManager to manage cookies
         return HttpClient.newBuilder()
@@ -51,7 +48,6 @@ public class BlockchainNodeIConfig {
     }
 
     @Bean
-    @Profile("!default")
     public void setDefaultBlockchainNodeConfiguration() {
         try {
             createBlockchainNodeConfiguration();
@@ -62,7 +58,6 @@ public class BlockchainNodeIConfig {
     }
 
     @Bean
-    @Profile("!default")
     public void setDefaultSubscriptions() {
         if(blockchainProperties.subscription().active()) {
             try {

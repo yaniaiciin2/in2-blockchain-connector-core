@@ -21,7 +21,8 @@ public class OrionLdNotificationController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<Void> orionLdNotification(@RequestBody OrionLdNotificationDTO orionLdNotificationDTO) {
         log.debug("Notification received: {}", orionLdNotificationDTO.toString());
-        return Mono.fromRunnable(() -> orionLdNotificationService.processNotification(orionLdNotificationDTO)).then();
+        return orionLdNotificationService.processNotification(orionLdNotificationDTO);
     }
+
 
 }

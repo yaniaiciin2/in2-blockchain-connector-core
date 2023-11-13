@@ -8,8 +8,10 @@ import es.in2.blockchain.connector.core.utils.AuditStatus;
 import es.in2.blockchain.connector.integration.orionld.domain.OnChainEntityDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,33 +21,38 @@ public class AuditServiceImpl implements AuditService {
     private final HashLinkService hashLinkService;
 
     @Override
-    public Transaction createTransaction(OnChainEntityDTO onChainEntityDTO) {
-        String id = onChainEntityDTO.getId();
-        Transaction transaction = Transaction.builder()
-                .entityId(id)
-                .entityHash("")
-                .dataLocation(hashLinkService.createHashLink(id, onChainEntityDTO.getData()))
-                .status(AuditStatus.RECEIVED.getDescription())
-                .build();
-        saveTransaction(transaction);
-        return transaction;
+    public Mono<Transaction> createTransaction(OnChainEntityDTO onChainEntityDTO) {
+        return Mono.fromCallable(() -> {
+            String id = onChainEntityDTO.getId();
+            Transaction transaction = Transaction.builder()
+                    .entityId(id)
+                    .entityHash("")
+                    .dataLocation(String.valueOf(hashLinkService.createHashLink(id, onChainEntityDTO.getData())))
+                    .status(AuditStatus.RECEIVED.getDescription())
+                    .build();
+            saveTransaction(transaction);
+            return transaction;
+        });
     }
 
     @Override
-    public void updateTransaction(Transaction transaction) {
-        Transaction transactionFound = transactionRepository.findById(transaction.getId());
-        checkIfTransactionExist(transactionFound);
-        saveTransaction(transaction);
+    public Mono<Void> updateTransaction(Transaction transaction) {
+        return findTransactionById(transaction.getId())
+                .switchIfEmpty(Mono.error(new NoSuchElementException("Transaction not found.")))
+                .flatMap(existingTransaction -> {
+                    saveTransaction(transaction);
+                    return Mono.empty();
+                });
     }
 
-    private void checkIfTransactionExist(Transaction transactionFound) {
-        if (transactionFound == null) {
-            throw new NoSuchElementException("Transaction not found.");
-        }
+
+
+
+    private Mono<Transaction> findTransactionById(UUID id) {
+        return Mono.fromCallable(() -> transactionRepository.findById(id));
     }
 
     private void saveTransaction(Transaction transaction) {
         transactionRepository.save(transaction);
     }
-
 }

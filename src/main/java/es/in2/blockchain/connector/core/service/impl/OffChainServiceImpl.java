@@ -25,21 +25,28 @@ public class OffChainServiceImpl implements OffChainService {
 	private final BrokerProperties brokerProperties;
 
 	@Override
-	public void retrieveAndPublishEntityToOffChain(BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
-		log.info(">>> Retrieving and publishing entity to off-chain...");
-		String dataLocation = blockchainNodeNotificationDTO.getDataLocation();
-		log.debug(" > Data Location: {}", dataLocation);
-		String retrievedEntity = hashLinkService.resolveHashlink(dataLocation);
-		try {
-			String entityId = getIdFromOrionLdEntity(retrievedEntity);
-			String existingEntity = retrieveExistingOrionLdEntity(entityId);
-			log.debug("> Entity exists");
-			compareAndPublishEntities(entityId, existingEntity, retrievedEntity);
-		} catch (NoSuchElementException e) {
-			publishEntityToDestinationOffChain(retrievedEntity);
-			log.info("  > Entity published to off-chain");
-		}
+	public Mono<Void> retrieveAndPublishEntityToOffChain(BlockchainNodeNotificationDTO blockchainNodeNotificationDTO) {
+		return Mono.defer(() -> {
+			log.info(">>> Retrieving and publishing entity to off-chain...");
+			String dataLocation = blockchainNodeNotificationDTO.getDataLocation();
+			log.debug(" > Data Location: {}", dataLocation);
+
+			return Mono.fromCallable(() -> {
+				String retrievedEntity = String.valueOf(hashLinkService.resolveHashlink(dataLocation));
+				try {
+					String entityId = getIdFromOrionLdEntity(retrievedEntity);
+					String existingEntity = retrieveExistingOrionLdEntity(entityId);
+					log.debug("> Entity exists");
+					compareAndPublishEntities(existingEntity, retrievedEntity).subscribe(); // Suscribe para que se ejecute
+				} catch (NoSuchElementException e) {
+					publishEntityToDestinationOffChain(retrievedEntity);
+					log.info("  > Entity published to off-chain");
+				}
+				return null;
+			}).then();
+		});
 	}
+
 
 	private String buildOrionLdEntityUrl(String entityId) {
 		return brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + entityId;
@@ -76,19 +83,26 @@ public class OffChainServiceImpl implements OffChainService {
 		applicationUtils.postRequest(orionLdEntitiesUrl, retrievedEntity);
 	}
 
-	private boolean areEntitiesEqual(String retrievedEntity, String existingEntity) {
+	private Mono<Boolean> areEntitiesEqual(String retrievedEntity, String existingEntity) {
 		return hashLinkService.compareHashLinksFromEntities(retrievedEntity, existingEntity);
 	}
 
-	private void compareAndPublishEntities(String entityId, String existingEntity, String retrievedEntity) {
-		if (!areEntitiesEqual(retrievedEntity, existingEntity)) {
-			log.debug("> Entities not equal");
-			String retrievedEntityUrl = buildOrionLdEntityUrl(entityId);
-			applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity);
-			log.info("  > Entity updated to off-chain");
-		} else {
-			log.info("> Same entities. No changes.");
-		}
+
+	private Mono<Void> compareAndPublishEntities(String existingEntity, String retrievedEntity) {
+		return areEntitiesEqual(retrievedEntity, existingEntity)
+				.flatMap(isTrue -> {
+					if (Boolean.TRUE.equals(isTrue)) {
+						log.info("> Same entities. No changes.");
+						return Mono.empty();
+					} else {
+						log.debug("> Entities not equal");
+						String retrievedEntityUrl = buildOrionLdUpdateEntityUrl();
+						return applicationUtils.patchRequest(retrievedEntityUrl, retrievedEntity)
+								.doOnSuccess(result -> log.info(" > Entity updated to off-chain"))
+								.doOnError(error -> log.error("Error updating entity to off-chain", error))
+								.then();
+					}
+				});
 	}
 
 
