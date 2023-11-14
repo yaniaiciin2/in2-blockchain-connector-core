@@ -28,8 +28,8 @@ broker-adapter:
 
 # Context Broker Configuration
 broker:
-  externalDomain: https://kong.dome-marketplace.org/scorpio
-  internalDomain: http://scorpio:1026
+  externalDomain: https://<domain.org>/orion-ld
+  internalDomain: http://localhost:1026
 
 # NGSI Subscription Configuration
 ngsi-subscription:
