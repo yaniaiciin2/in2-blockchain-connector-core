@@ -1,6 +1,6 @@
 package es.in2.blockchainconnector.integration.brokeradapter.controller;
 
-import es.in2.blockchainconnector.integration.brokeradapter.domain.OrionLdNotificationDTO;
+import es.in2.blockchainconnector.integration.brokeradapter.domain.BrokerNotificationDTO;
 import es.in2.blockchainconnector.integration.brokeradapter.service.BrokerAdapterNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +18,9 @@ public class BrokerAdapterNotificationController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Mono<Void> brokerNotification(@RequestBody OrionLdNotificationDTO orionLdNotificationDTO) {
-        log.debug("Notification received: {}", orionLdNotificationDTO.toString());
-        return brokerAdapterNotificationService.processNotification(orionLdNotificationDTO);
+    public Mono<Void> brokerNotification(@RequestBody BrokerNotificationDTO brokerNotificationDTO) {
+        log.debug("Broker Notification received: {}", brokerNotificationDTO.toString());
+        return brokerAdapterNotificationService.processNotification(brokerNotificationDTO);
     }
 
 }
