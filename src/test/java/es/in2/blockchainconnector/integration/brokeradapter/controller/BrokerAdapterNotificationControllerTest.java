@@ -1,7 +1,7 @@
 //package es.in2.blockchainconnector.integration.brokeradapter.controller;
 //
 //import es.in2.blockchainconnector.core.service.impl.OnChainServiceImpl;
-//import es.in2.blockchainconnector.integration.brokeradapter.service.BrokerAdapterNotificationService;
+//import es.in2.blockchainconnector.service.BrokerAdapterNotificationService;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.mockito.InjectMocks;

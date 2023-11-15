@@ -1,10 +1,13 @@
 # temp build
-FROM docker.io/gradle:8.0.2-jdk AS TEMP_BUILD
+FROM docker.io/gradle:8.4.0 AS TEMP_BUILD
 ARG SKIP_TESTS=false
 # Copy project files
 COPY build.gradle settings.gradle /home/gradle/src/
 COPY src /home/gradle/src/src
+COPY config /home/gradle/src/config
+COPY docs /home/gradle/src/docs
 COPY gradle /home/gradle/src/gradle
+COPY monitoring /home/gradle/src/monitoring
 WORKDIR /home/gradle/src
 RUN if [ "$SKIP_TESTS" = "true" ]; then \
     gradle build --no-daemon -x test; \

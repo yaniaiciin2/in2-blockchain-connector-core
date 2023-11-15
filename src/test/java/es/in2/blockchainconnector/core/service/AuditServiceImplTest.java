@@ -4,7 +4,7 @@
 //import es.in2.blockchainconnector.core.repository.TransactionRepository;
 //import es.in2.blockchainconnector.core.service.impl.AuditServiceImpl;
 //import es.in2.blockchainconnector.core.service.impl.HashLinkServiceImpl;
-//import es.in2.blockchainconnector.integration.brokeradapter.domain.OnChainEventDTO;
+//import es.in2.blockchainconnector.domain.OnChainEventDTO;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.mockito.InjectMocks;
