@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.Map;
 
 @Builder
-public record OnChainEntityDTO(
+public record OnChainEventDTO(
         String id,
         String eventType,
         Map<String, Object> dataMap,

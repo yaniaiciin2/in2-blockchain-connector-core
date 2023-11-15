@@ -19,7 +19,7 @@ public class BrokerAdapterNotificationController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public Mono<Void> brokerNotification(@RequestBody BrokerNotificationDTO brokerNotificationDTO) {
-        log.debug("Context Broker - Notification received: {}", brokerNotificationDTO.toString());
+        log.debug("Broker Notification received: {}", brokerNotificationDTO.toString());
         return brokerAdapterNotificationService.processNotification(brokerNotificationDTO);
     }
 

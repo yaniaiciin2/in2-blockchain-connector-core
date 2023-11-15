@@ -15,6 +15,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,7 +27,9 @@ import static es.in2.blockchainconnector.core.utils.BlockchainConnectorUtils.CON
 @Component
 public class ApplicationUtils {
 
-    public String getRequest(String url) {
+    public static final String SHA_256_ALGORITHM = "SHA-256";
+
+    public static String getRequest(String url) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -37,9 +40,23 @@ public class ApplicationUtils {
         // Send request asynchronously
         CompletableFuture<HttpResponse<String>> response =
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        // Verify Response HttpStatus
-        checkGetResponse(response);
         return response.thenApply(HttpResponse::body).join();
+    }
+
+    public static String calculateSHA256Hash(String data) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance(SHA_256_ALGORITHM);
+        byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(hash);
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        Formatter formatter = new Formatter();
+        for (byte b : bytes) {
+            formatter.format("%02x", b);
+        }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
     }
 
     public Mono<Void> patchRequest(String url, String requestBody) {
@@ -75,7 +92,7 @@ public class ApplicationUtils {
         }
     }
 
-    public void postRequest(String url, String requestBody) {
+    public static String postRequest(String url, String requestBody) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -86,8 +103,7 @@ public class ApplicationUtils {
         // Send request asynchronously
         CompletableFuture<HttpResponse<String>> response =
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        // Verify Response HttpStatus
-        checkResponse(response);
+        return response.thenApply(HttpResponse::body).join();
     }
 
     private void checkResponse(CompletableFuture<HttpResponse<String>> response) {
@@ -101,20 +117,6 @@ public class ApplicationUtils {
                 throw new RequestErrorException("Bad Request: " + body);
             }
         }
-    }
-
-    public String calculateSHA256Hash(String data) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hash);
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder result = new StringBuilder();
-        for (byte b : bytes) {
-            result.append(String.format("%02x", b));
-        }
-        return result.toString();
     }
 
 }

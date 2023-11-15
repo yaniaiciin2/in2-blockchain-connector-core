@@ -6,7 +6,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class OnChainEntityTest {
+class OnChainEventTest {
 
     @Test
     void testDomeEventToString() {
@@ -15,13 +15,13 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        OnChainEntity onChainEntity = OnChainEntity.builder()
+        OnChainEvent onChainEvent = OnChainEvent.builder()
                 .eventType(eventType)
                 .dataLocation(dataLocation)
                 .metadata(metadata).build();
 
         // Act
-        String result = onChainEntity.toString();
+        String result = onChainEvent.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = [meta1, meta2]}";
@@ -35,14 +35,14 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = List.of();
 
-        OnChainEntity onChainEntity = OnChainEntity.builder()
+        OnChainEvent onChainEvent = OnChainEvent.builder()
                 .eventType(eventType)
                 .dataLocation(dataLocation)
                 .metadata(metadata).build();
 
 
         // Act
-        String result = onChainEntity.toString();
+        String result = onChainEvent.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = []}";
@@ -55,14 +55,14 @@ class OnChainEntityTest {
         String eventType = "SampleEvent";
         String dataLocation = "/path/to/data";
 
-        OnChainEntity onChainEntity = OnChainEntity.builder()
+        OnChainEvent onChainEvent = OnChainEvent.builder()
                 .eventType(eventType)
                 .dataLocation(dataLocation)
                 .metadata(null).build();
 
 
         // Act
-        String result = onChainEntity.toString();
+        String result = onChainEvent.toString();
 
         // Assert
         String expected = "DOME Event {eventType = SampleEvent, dataLocation = /path/to/data, metadata = null}";
@@ -76,16 +76,16 @@ class OnChainEntityTest {
         String dataLocation = "/path/to/data";
         List<String> metadata = Arrays.asList("meta1", "meta2");
 
-        OnChainEntity onChainEntity = OnChainEntity.builder()
+        OnChainEvent onChainEvent = OnChainEvent.builder()
                 .eventType(eventType)
                 .dataLocation(dataLocation)
                 .metadata(metadata).build();
 
 
         // Act
-        String actualEventType = onChainEntity.getEventType();
-        String actualDataLocation = onChainEntity.getDataLocation();
-        List<String> actualMetadata = onChainEntity.getMetadata();
+        String actualEventType = onChainEvent.eventType();
+        String actualDataLocation = onChainEvent.dataLocation();
+        List<String> actualMetadata = onChainEvent.metadata();
 
         // Assert
         assertEquals(eventType, actualEventType);

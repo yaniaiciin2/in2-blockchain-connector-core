@@ -15,6 +15,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.security.NoSuchAlgorithmException;
 
+import static es.in2.blockchainconnector.core.utils.ApplicationUtils.calculateSHA256Hash;
+import static es.in2.blockchainconnector.core.utils.ApplicationUtils.getRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
@@ -43,7 +45,7 @@ class HashLinkServiceImplTest {
 		String data = "sampleData";
 		String expectedHashlink = "https://example.com/entities/sampleId?hl=sampleHash";
 
-		when(applicationUtils.calculateSHA256Hash(data)).thenReturn("sampleHash");
+		when(calculateSHA256Hash(data)).thenReturn("sampleHash");
 
 		// Act
 		String hashlink = String.valueOf(hashLinkService.createHashLink(id, data).block());
@@ -58,8 +60,8 @@ class HashLinkServiceImplTest {
 		String dataLocation = "https://example.com/data-location?hl=sampleHash";
 		String expectedEntityData = "sampleEntityData";
 
-		when(applicationUtils.calculateSHA256Hash(expectedEntityData)).thenReturn("sampleHash");
-		when(applicationUtils.getRequest("https://example.com/data-location")).thenReturn(expectedEntityData);
+		when(calculateSHA256Hash(expectedEntityData)).thenReturn("sampleHash");
+		when(getRequest("https://example.com/data-location")).thenReturn(expectedEntityData);
 
 		// Act
 		String retrievedEntity = String.valueOf(hashLinkService.resolveHashlink(dataLocation).block());
@@ -74,8 +76,8 @@ class HashLinkServiceImplTest {
 		String dataLocation = "https://example.com/data-location?hl=sampleHash";
 		String expectedEntityData = "sampleEntityData";
 
-		when(applicationUtils.calculateSHA256Hash(expectedEntityData)).thenReturn("sampleHash5");
-		when(applicationUtils.getRequest("https://example.com/data-location")).thenReturn(expectedEntityData);
+		when(calculateSHA256Hash(expectedEntityData)).thenReturn("sampleHash5");
+		when(getRequest("https://example.com/data-location")).thenReturn(expectedEntityData);
 
 		// Assert
 		assertThrows(InvalidHashlinkComparisonException.class, () -> (hashLinkService.resolveHashlink(dataLocation)).block());
@@ -84,7 +86,7 @@ class HashLinkServiceImplTest {
 	@Test
 	void testCompareHashlinks() throws Exception {
 		// Mock the createHashFromEntity method to return a specific value
-		when(applicationUtils.calculateSHA256Hash(anyString())).thenReturn("mockedHash");
+		when(calculateSHA256Hash(anyString())).thenReturn("mockedHash");
 		// Call the compareHashlinks method with some input parameters
 		String dataLocation = "https://example.com/entity?hl=mockedHash";
 		String originOffChaiEntity = "This is the entity data";
@@ -99,9 +101,9 @@ class HashLinkServiceImplTest {
 	void testCompareHashlinksWithDifferentOnes() throws Exception {
 		// Call the compareHashlinks method with some input parameters
 		String targetOffChainEntity = "Something";
-		when(applicationUtils.calculateSHA256Hash(targetOffChainEntity)).thenReturn("mockedHash");
+		when(calculateSHA256Hash(targetOffChainEntity)).thenReturn("mockedHash");
 		String originOffChaiEntity = "Another thing";
-		when(applicationUtils.calculateSHA256Hash(originOffChaiEntity)).thenReturn("anothermockedHash");
+		when(calculateSHA256Hash(originOffChaiEntity)).thenReturn("anothermockedHash");
 		// Assert that the expected result is returned
 		assertEquals(Boolean.FALSE, hashLinkService.compareHashLinksFromEntities(targetOffChainEntity, originOffChaiEntity).block());
 		// Verify that the createHashFromEntity method was called with the expected parameter

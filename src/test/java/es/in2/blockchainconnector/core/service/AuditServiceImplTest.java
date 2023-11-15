@@ -4,7 +4,7 @@ import es.in2.blockchainconnector.core.domain.Transaction;
 import es.in2.blockchainconnector.core.repository.TransactionRepository;
 import es.in2.blockchainconnector.core.service.impl.AuditServiceImpl;
 import es.in2.blockchainconnector.core.service.impl.HashLinkServiceImpl;
-import es.in2.blockchainconnector.integration.brokeradapter.domain.OnChainEntityDTO;
+import es.in2.blockchainconnector.integration.brokeradapter.domain.OnChainEventDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,13 +39,13 @@ import static org.mockito.Mockito.*;
     @Test
      void testCreateTransaction() {
         // Data
-        OnChainEntityDTO onChainEntityDTO = OnChainEntityDTO.builder()
+        OnChainEventDTO onChainEventDTO = OnChainEventDTO.builder()
                 .id("123")
                 .data("Sample Data")
                 .build();
         when(hashLinkService.createHashLink(any(), any())).thenReturn(Mono.just("hashed-data"));
         // Act
-        Mono<Transaction> createdTransaction = auditService.createTransaction(onChainEntityDTO);
+        Mono<Transaction> createdTransaction = auditService.createTransaction(onChainEventDTO);
         Transaction transaction = createdTransaction.block();
 
         // Assert
