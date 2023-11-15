@@ -19,7 +19,7 @@ blockchain:
   subscription:
     active: false
     notificationEndpoint: http://blockchain-connector-core:8080/notifications/dlt
-    entityTypes: >
+    eventTypes: >
       ProductOffering
 
 # Broker Adapter Configuration
