@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.core.utils.BlockchainConnectorUtils;
 import es.in2.blockchainconnector.integration.brokeradapter.configuration.properties.BrokerAdapterProperties;
 import es.in2.blockchainconnector.integration.brokeradapter.configuration.properties.NgsiLdSubscriptionConfigProperties;
-import es.in2.blockchainconnector.integration.brokeradapter.domain.OrionLdSubscriptionDTO;
+import es.in2.blockchainconnector.integration.brokeradapter.domain.BrokerSubscriptionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -34,17 +34,17 @@ public class BrokerAdapterConfig {
     @Profile("default")
     public void setBrokerSubscription() {
         log.info(">>> Setting Orion-LD Entities subscription...");
-        OrionLdSubscriptionDTO orionLdSubscriptionDTO = OrionLdSubscriptionDTO.builder()
+        BrokerSubscriptionDTO brokerSubscriptionDTO = BrokerSubscriptionDTO.builder()
                 .id("urn:ngsi-ld:Subscription:" + UUID.randomUUID())
                 .type("Subscription")
                 .notificationEndpointUri(subscriptionConfiguration.notificationEndpoint())
                 .entities(subscriptionConfiguration.entityTypes())
                 .build();
-        log.debug(" > Orion-LD Subscription: {}", orionLdSubscriptionDTO.toString());
+        log.debug(" > Orion-LD Subscription: {}", brokerSubscriptionDTO.toString());
         try {
             String orionLdInterfaceUrl = brokerAdapterProperties.domain() + brokerAdapterProperties.paths().subscribe();
             log.debug(" > Orion-LD Subscription URL: {}", orionLdInterfaceUrl);
-            String requestBody = objectMapper.writer().writeValueAsString(orionLdSubscriptionDTO);
+            String requestBody = objectMapper.writer().writeValueAsString(brokerSubscriptionDTO);
             log.debug(" > Orion-LD Subscription request body: {}", requestBody);
             // Create request
             HttpClient client = HttpClient.newHttpClient();

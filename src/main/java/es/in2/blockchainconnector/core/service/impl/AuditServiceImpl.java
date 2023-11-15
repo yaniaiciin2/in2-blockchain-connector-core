@@ -23,11 +23,11 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public Mono<Transaction> createTransaction(OnChainEntityDTO onChainEntityDTO) {
         return Mono.fromCallable(() -> {
-            String id = onChainEntityDTO.getId();
+            String id = onChainEntityDTO.id();
             Transaction transaction = Transaction.builder()
                     .entityId(id)
                     .entityHash("")
-                    .dataLocation(String.valueOf(hashLinkService.createHashLink(id, onChainEntityDTO.getData())))
+                    .dataLocation(String.valueOf(hashLinkService.createHashLink(id, onChainEntityDTO.data())))
                     .status(AuditStatus.RECEIVED.getDescription())
                     .build();
             saveTransaction(transaction);

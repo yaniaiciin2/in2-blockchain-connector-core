@@ -39,11 +39,10 @@ import static org.mockito.Mockito.*;
     @Test
      void testCreateTransaction() {
         // Data
-        OnChainEntityDTO onChainEntityDTO = new OnChainEntityDTO();
-        onChainEntityDTO.setId("123");
-        onChainEntityDTO.setData("Sample Data");
-
-
+        OnChainEntityDTO onChainEntityDTO = OnChainEntityDTO.builder()
+                .id("123")
+                .data("Sample Data")
+                .build();
         when(hashLinkService.createHashLink(any(), any())).thenReturn(Mono.just("hashed-data"));
         // Act
         Mono<Transaction> createdTransaction = auditService.createTransaction(onChainEntityDTO);

@@ -97,11 +97,11 @@ public class OnChainServiceImpl implements OnChainService {
 	}
 
 	private Mono<OnChainEntity> createOnChainEntity(OnChainEntityDTO onChainEntityDTO, Transaction transaction) {
-		return hashLinkService.createHashLink(onChainEntityDTO.getId(), onChainEntityDTO.getData())
+		return hashLinkService.createHashLink(onChainEntityDTO.id(), onChainEntityDTO.data())
 				.flatMap(dataLocation -> {
 					log.debug("Creating On-Chain Entity DTO...");
 					OnChainEntity onChainEntity = OnChainEntity.builder()
-							.eventType(onChainEntityDTO.getEventType())
+							.eventType(onChainEntityDTO.eventType())
 							.organizationId(operatorProperties.id())
 							.dataLocation(dataLocation)
 							.metadata(List.of("metadata1", "metadata2"))
