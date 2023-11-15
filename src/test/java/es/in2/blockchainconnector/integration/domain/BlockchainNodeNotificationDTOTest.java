@@ -1,8 +1,8 @@
 //package es.in2.blockchainconnector.integration.domain;
 //
 //import es.in2.blockchainconnector.integration.dltadapter.domain.BlockchainNodeNotificationDTO;
-//import es.in2.blockchainconnector.integration.dltadapter.domain.BlockchainNodeNotificationIdDTO;
-//import es.in2.blockchainconnector.integration.dltadapter.domain.BlockchainNodeNotificationTimestampDTO;
+//import es.in2.blockchainconnector.domain.BlockchainNodeNotificationIdDTO;
+//import es.in2.blockchainconnector.domain.BlockchainNodeNotificationTimestampDTO;
 //import org.junit.jupiter.api.Test;
 //
 //import java.util.Arrays;

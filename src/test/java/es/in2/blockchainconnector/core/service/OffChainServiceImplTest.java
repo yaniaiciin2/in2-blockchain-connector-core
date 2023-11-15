@@ -6,8 +6,8 @@
 //import es.in2.blockchainconnector.core.service.impl.OffChainServiceImpl;
 //import es.in2.blockchainconnector.core.utils.ApplicationUtils;
 //import es.in2.blockchainconnector.integration.dltadapter.domain.BlockchainNodeNotificationDTO;
-//import es.in2.blockchainconnector.integration.brokeradapter.configuration.properties.BrokerPathProperties;
-//import es.in2.blockchainconnector.integration.brokeradapter.configuration.properties.BrokerProperties;
+//import es.in2.blockchainconnector.configuration.properties.BrokerPathProperties;
+//import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.mockito.Mock;
