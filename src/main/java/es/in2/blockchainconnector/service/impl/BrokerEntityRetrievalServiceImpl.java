@@ -28,7 +28,7 @@ public class BrokerEntityRetrievalServiceImpl implements BrokerEntityRetrievalSe
         return Mono.create(sink -> {
             // Get URL from the DLTNotificationDTO.dataLocation()
             String sourceBrokerEntityURL = Arrays.stream(dltNotificationDTO.dataLocation()
-                            .split(HASHLINK_PREFIX))
+                            .split("\\?hl="))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
             // Execute a GET request to the Source Context Broker

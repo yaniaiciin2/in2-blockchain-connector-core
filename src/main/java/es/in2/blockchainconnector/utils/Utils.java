@@ -2,11 +2,7 @@ package es.in2.blockchainconnector.utils;
 
 import es.in2.blockchainconnector.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,13 +30,21 @@ public class Utils {
         return string == null || string.isBlank();
     }
 
-    public static String getRequest(String url) {
+    public static CompletableFuture<HttpResponse<String>> getRequest(String url) {
+        // Create request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).headers(ACCEPT_HEADER, APPLICATION_JSON).GET().build();
+        // Send request asynchronously
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static int getRequestResponseCode(String url) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).headers(ACCEPT_HEADER, APPLICATION_JSON).GET().build();
         // Send request asynchronously
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        return response.thenApply(HttpResponse::body).join();
+        return response.thenApply(HttpResponse::statusCode).join();
     }
 
     public static String calculateSHA256Hash(String data) throws NoSuchAlgorithmException {
@@ -57,17 +61,6 @@ public class Utils {
         String result = formatter.toString();
         formatter.close();
         return result;
-    }
-
-    public Mono<Void> patchRequest(String url, String requestBody) {
-        WebClient webClient = WebClient.builder().baseUrl(url).build();
-        return webClient.method(HttpMethod.PATCH).body(BodyInserters.fromValue(requestBody)).exchangeToMono(response -> {
-            if (response.statusCode().is2xxSuccessful()) {
-                return Mono.empty();
-            } else {
-                return response.bodyToMono(String.class).flatMap(errorBody -> Mono.error(new RequestErrorException("Error making PATCH request: " + errorBody)));
-            }
-        }).then();
     }
 
     private void checkGetResponse(CompletableFuture<HttpResponse<String>> response) {
@@ -92,6 +85,23 @@ public class Utils {
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         return response.thenApply(HttpResponse::body).join();
     }
+
+    public static String patchRequest(String url, String requestBody) {
+        // Create request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .headers(CONTENT_TYPE, APPLICATION_JSON, ACCEPT_HEADER, APPLICATION_JSON)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        // Send request asynchronously
+        CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+        // Wait for the response and return the body
+        return response.thenApply(HttpResponse::body).join();
+    }
+
 
     private void checkResponse(CompletableFuture<HttpResponse<String>> response) {
         String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();

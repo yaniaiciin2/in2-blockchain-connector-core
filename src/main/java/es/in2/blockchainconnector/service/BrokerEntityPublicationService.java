@@ -4,4 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface BrokerEntityPublicationService {
     Mono<Void> publishEntityToBroker(String brokerEntity);
+    Mono<Void> updateEntityToBroker(String brokerEntity);
 }

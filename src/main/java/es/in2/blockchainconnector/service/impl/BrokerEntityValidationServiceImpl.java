@@ -28,7 +28,7 @@ public class BrokerEntityValidationServiceImpl implements BrokerEntityValidation
             // Get URL from the DLTNotificationDTO.dataLocation()
             String dataLocation = dltNotificationDTO.dataLocation();
             log.debug(" > Data location: {}", dataLocation);
-            String sourceBrokerEntityURL = Arrays.stream(dataLocation.split(HASHLINK_PREFIX))
+            String sourceBrokerEntityURL = Arrays.stream(dataLocation.split("\\?hl="))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
             log.debug(" > Source broker entity URL: {}", sourceBrokerEntityURL);
