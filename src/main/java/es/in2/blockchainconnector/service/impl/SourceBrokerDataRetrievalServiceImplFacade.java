@@ -38,13 +38,13 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
                 })
                 .flatMap(validatedEntity -> {
                     log.info("Entity validated successfully: {}", validatedEntity);
-                    return hanndleBrokerResponse(validatedEntity);
+                    return handleBrokerResponse(validatedEntity);
                     // todo delete
                 })
                 .doOnTerminate(() -> log.info("Entity retrieval, validation, and publication completed"));
     }
 
-    private Mono<Void> hanndleBrokerResponse(String validatedEntity) {
+    private Mono<Void> handleBrokerResponse(String validatedEntity) {
         try {
             // Depending on the status code it will decide if update or publish
             int statusCode = getRequestResponseCode(brokerAdapterProperties.domain() +
