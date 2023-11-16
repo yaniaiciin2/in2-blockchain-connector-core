@@ -1,13 +1,12 @@
 package es.in2.blockchainconnector.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -43,6 +42,21 @@ public class Utils {
         return response.thenApply(HttpResponse::body).join();
     }
 
+    public static int getResponseCode(String url) {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        try {
+            return client.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RequestErrorException("Failed to get Response Code");
+        }
+    }
+
     public static String calculateSHA256Hash(String data) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance(SHA_256_ALGORITHM);
         byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
@@ -57,17 +71,6 @@ public class Utils {
         String result = formatter.toString();
         formatter.close();
         return result;
-    }
-
-    public Mono<Void> patchRequest(String url, String requestBody) {
-        WebClient webClient = WebClient.builder().baseUrl(url).build();
-        return webClient.method(HttpMethod.PATCH).body(BodyInserters.fromValue(requestBody)).exchangeToMono(response -> {
-            if (response.statusCode().is2xxSuccessful()) {
-                return Mono.empty();
-            } else {
-                return response.bodyToMono(String.class).flatMap(errorBody -> Mono.error(new RequestErrorException("Error making PATCH request: " + errorBody)));
-            }
-        }).then();
     }
 
     private void checkGetResponse(CompletableFuture<HttpResponse<String>> response) {
@@ -92,6 +95,39 @@ public class Utils {
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         return response.thenApply(HttpResponse::body).join();
     }
+
+    public static String patchRequest(String url, String requestBody) {
+        // Create request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .headers(CONTENT_TYPE, APPLICATION_JSON, ACCEPT_HEADER, APPLICATION_JSON)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        // Send request asynchronously
+        CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
+        // Wait for the response and return the body
+        return response.thenApply(HttpResponse::body).join();
+    }
+
+    public static String extractIdFromJson(String jsonString) {
+        try {
+            // Crear un ObjectMapper de Jackson
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // Convertir la cadena JSON a un JsonNode
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+            // Extraer el valor del campo "id" como una cadena
+            return jsonNode.get("id").asText();
+        } catch (Exception e) {
+            e.printStackTrace(); // Manejar excepciones según tus necesidades
+            return null;
+        }
+    }
+
 
     private void checkResponse(CompletableFuture<HttpResponse<String>> response) {
         String statusCode = response.thenApply(HttpResponse::statusCode).join().toString();
