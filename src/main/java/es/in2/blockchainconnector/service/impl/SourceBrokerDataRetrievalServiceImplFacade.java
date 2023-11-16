@@ -1,7 +1,10 @@
 package es.in2.blockchainconnector.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.configuration.properties.BrokerAdapterProperties;
 import es.in2.blockchainconnector.domain.DLTNotificationDTO;
+import es.in2.blockchainconnector.exception.JsonReadingException;
 import es.in2.blockchainconnector.exception.RequestErrorException;
 import es.in2.blockchainconnector.service.BrokerEntityPublicationService;
 import es.in2.blockchainconnector.service.BrokerEntityRetrievalService;
@@ -12,8 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import static es.in2.blockchainconnector.utils.Utils.extractIdFromJson;
-import static es.in2.blockchainconnector.utils.Utils.getResponseCode;
+import static es.in2.blockchainconnector.utils.Utils.getRequestResponseCode;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
     private final BrokerEntityValidationService brokerEntityValidationService;
     private final BrokerEntityPublicationService brokerEntityPublicationService;
     private final BrokerAdapterProperties brokerAdapterProperties;
+    private final ObjectMapper objectMapper;
 
     @Override
     public Mono<Void> retrieveAndPublishABrokerEntityIntContextBroker(DLTNotificationDTO dltNotificationDTO) {
@@ -35,18 +38,18 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
                 })
                 .flatMap(validatedEntity -> {
                     log.info("Entity validated successfully: {}", validatedEntity);
-                    return handleResponse(validatedEntity);
+                    return hanndleBrokerResponse(validatedEntity);
                     // todo delete
                 })
                 .doOnTerminate(() -> log.info("Entity retrieval, validation, and publication completed"));
     }
 
-    private Mono<Void> handleResponse(String validatedEntity) {
+    private Mono<Void> hanndleBrokerResponse(String validatedEntity) {
         try {
             // Depending on the status code it will decide if update or publish
-            int statusCode = getResponseCode(brokerAdapterProperties.domain() +
+            int statusCode = getRequestResponseCode(brokerAdapterProperties.domain() +
                     brokerAdapterProperties.paths().entities() +
-                    "/" + extractIdFromJson(validatedEntity));
+                    "/" + extractIdFromEntity(validatedEntity));
 
             if (statusCode == 200) {
                 log.info(" > Entity exists");
@@ -63,6 +66,15 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
         } catch (Exception e) {
             log.error("Error handling response", e);
             return Mono.error(e);
+        }
+    }
+
+    private String extractIdFromEntity(String entity) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(entity);
+            return jsonNode.get("id").asText();
+        } catch (Exception e) {
+            throw new JsonReadingException("Error while extracting data from entity");
         }
     }
 

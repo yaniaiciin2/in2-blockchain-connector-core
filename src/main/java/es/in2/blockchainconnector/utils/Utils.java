@@ -1,12 +1,9 @@
 package es.in2.blockchainconnector.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.exception.RequestErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -42,19 +39,13 @@ public class Utils {
         return response.thenApply(HttpResponse::body).join();
     }
 
-    public static int getResponseCode(String url) {
+    public static int getRequestResponseCode(String url) {
+        // Create request
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .method("HEAD", HttpRequest.BodyPublishers.noBody())
-                .build();
-
-        try {
-            return client.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
-        } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RequestErrorException("Failed to get Response Code");
-        }
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).headers(ACCEPT_HEADER, APPLICATION_JSON).GET().build();
+        // Send request asynchronously
+        CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        return response.thenApply(HttpResponse::statusCode).join();
     }
 
     public static String calculateSHA256Hash(String data) throws NoSuchAlgorithmException {
@@ -110,22 +101,6 @@ public class Utils {
 
         // Wait for the response and return the body
         return response.thenApply(HttpResponse::body).join();
-    }
-
-    public static String extractIdFromJson(String jsonString) {
-        try {
-            // Crear un ObjectMapper de Jackson
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // Convertir la cadena JSON a un JsonNode
-            JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-            // Extraer el valor del campo "id" como una cadena
-            return jsonNode.get("id").asText();
-        } catch (Exception e) {
-            e.printStackTrace(); // Manejar excepciones según tus necesidades
-            return null;
-        }
     }
 
 
