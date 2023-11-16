@@ -15,6 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
+
+import static es.in2.blockchainconnector.utils.Utils.getRequest;
 import static es.in2.blockchainconnector.utils.Utils.getRequestResponseCode;
 
 @Slf4j
@@ -47,19 +51,21 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
     private Mono<Void> handleBrokerResponse(String validatedEntity) {
         try {
             // Depending on the status code it will decide if update or publish
-            int statusCode = getRequestResponseCode(brokerAdapterProperties.domain() +
+            CompletableFuture<HttpResponse<String>> retrievedEntity = getRequest(brokerAdapterProperties.domain() +
                     brokerAdapterProperties.paths().entities() +
                     "/" + extractIdFromEntity(validatedEntity));
 
-            if (statusCode == 200) {
+            int responseCode = retrievedEntity.thenApply(HttpResponse::statusCode).join();
+
+            if (responseCode == 200) {
                 log.info(" > Entity exists");
                 return brokerEntityPublicationService.updateEntityToBroker(validatedEntity);
-            } else if (statusCode == 404) {
+            } else if (responseCode == 404) {
                 log.info(" > Entity doesn't exist");
                 return brokerEntityPublicationService.publishEntityToBroker(validatedEntity);
             } else {
-                log.warn("Unhandled response status code: {}", statusCode);
-                return Mono.error(new RequestErrorException("Unhandled response status code: " + statusCode));
+                log.warn("Unhandled response status code: {}", responseCode);
+                return Mono.error(new RequestErrorException("Unhandled response status code: " + responseCode));
             }
 
 

@@ -30,13 +30,12 @@ public class Utils {
         return string == null || string.isBlank();
     }
 
-    public static String getRequest(String url) {
+    public static CompletableFuture<HttpResponse<String>> getRequest(String url) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).headers(ACCEPT_HEADER, APPLICATION_JSON).GET().build();
         // Send request asynchronously
-        CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        return response.thenApply(HttpResponse::body).join();
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public static int getRequestResponseCode(String url) {
