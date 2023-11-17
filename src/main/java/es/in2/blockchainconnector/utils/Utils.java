@@ -38,6 +38,19 @@ public class Utils {
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    public static CompletableFuture<HttpResponse<String>> deleteRequest(String url) {
+        // Create DELETE request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .headers(ACCEPT_HEADER, APPLICATION_JSON)
+                .DELETE()
+                .build();
+
+        // Send request asynchronously
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public static int getRequestResponseCode(String url) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
