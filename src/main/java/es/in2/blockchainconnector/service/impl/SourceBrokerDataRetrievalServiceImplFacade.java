@@ -16,10 +16,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
+import static es.in2.blockchainconnector.utils.Utils.deleteRequest;
 import static es.in2.blockchainconnector.utils.Utils.getRequest;
-import static es.in2.blockchainconnector.utils.Utils.getRequestResponseCode;
 
 @Slf4j
 @Service
@@ -42,8 +43,10 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
                 })
                 .flatMap(validatedEntity -> {
                     log.info("Entity validated successfully: {}", validatedEntity);
+                    if(checkIfDeleted(validatedEntity)) {
+                        return handleDeletedEntity(dltNotificationDTO);
+                    }
                     return handleBrokerResponse(validatedEntity);
-                    // todo delete
                 })
                 .doOnTerminate(() -> log.info("Entity retrieval, validation, and publication completed"));
     }
@@ -75,6 +78,22 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
         }
     }
 
+    private Mono<Void> handleDeletedEntity(DLTNotificationDTO dltNotificationDTO) {
+        String sourceBrokerEntityID = Arrays.stream(dltNotificationDTO.dataLocation().split("entities/|\\?hl="))
+                .skip(1)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+        int responseCode = deleteRequest(brokerAdapterProperties.domain() + brokerAdapterProperties.paths().delete()
+        + "/" + sourceBrokerEntityID).thenApply(HttpResponse::statusCode).join();
+
+        if(responseCode == 204) {
+            log.debug("Entity deleted successfully");
+        } else {
+            log.debug("Error while deleting entity");
+        }
+        return Mono.empty();
+    }
+
     private String extractIdFromEntity(String entity) {
         try {
             JsonNode jsonNode = objectMapper.readTree(entity);
@@ -82,6 +101,19 @@ public class SourceBrokerDataRetrievalServiceImplFacade implements SourceBrokerD
         } catch (Exception e) {
             throw new JsonReadingException("Error while extracting data from entity");
         }
+    }
+
+    private boolean checkIfDeleted(String response) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(response);
+            if (jsonNode.has("title")) {
+                String title = jsonNode.get("title").asText();
+                return "Entity Not Found".equals(title);
+            }
+        } catch (Exception e) {
+            throw new JsonReadingException("Error while extracting data from entity");
+        }
+        return false;
     }
 
 }

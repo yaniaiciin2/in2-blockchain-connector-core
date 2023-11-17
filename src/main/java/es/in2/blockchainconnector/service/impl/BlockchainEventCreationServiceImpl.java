@@ -12,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.net.http.HttpResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static es.in2.blockchainconnector.utils.Utils.HASHLINK_PREFIX;
+import static es.in2.blockchainconnector.utils.Utils.getRequest;
 
 @Slf4j
 @Service
@@ -30,8 +32,16 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
         return Mono.fromCallable(() -> {
             try {
                 log.debug(" > Creating blockchain event...");
-                // Calculate SHA-256 hash
-                String entityHashed = Utils.calculateSHA256Hash(onChainEventDTO.data());
+                String entityHashed;
+                if (onChainEventDTO.dataMap().containsKey("deletedAt")) {
+                    // Calculate SHA-256 hash from origin data
+                    entityHashed = Utils.calculateSHA256Hash(getRequest
+                            (brokerProperties.internalDomain() + brokerProperties.paths().entities() + "/" + onChainEventDTO.id())
+                            .thenApply(HttpResponse::body).join());
+                } else {
+                    // Calculate SHA-256 hash from the data
+                    entityHashed = Utils.calculateSHA256Hash(onChainEventDTO.data());
+                }
                 // Build dynamic URL by Broker Entity Use Case
                 String brokerEntityUrl = brokerProperties.internalDomain() + brokerProperties.paths().entities();
                 // Create DataLocation parameter (Hashlink)
