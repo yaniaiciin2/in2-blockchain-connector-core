@@ -49,7 +49,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                 // Build OnChainEvent
                 OnChainEvent onChainEvent = OnChainEvent.builder()
                         .eventType(onChainEventDTO.eventType())
-                        .organizationId(operatorProperties.organizationId())
+                        .organizationId(Utils.calculateSHA256Hash(operatorProperties.organizationId()))
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
