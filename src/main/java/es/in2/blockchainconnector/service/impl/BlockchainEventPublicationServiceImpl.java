@@ -2,11 +2,11 @@ package es.in2.blockchainconnector.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.in2.blockchainconnector.domain.OnChainEvent;
-import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
 import es.in2.blockchainconnector.configuration.DLTAdapterConfig;
 import es.in2.blockchainconnector.configuration.properties.DLTAdapterProperties;
+import es.in2.blockchainconnector.domain.OnChainEvent;
 import es.in2.blockchainconnector.exception.DLTAdapterCommunicationException;
+import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -48,11 +48,7 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                 CompletableFuture<HttpResponse<String>> responseFuture = dltAdapterConfig.dltAdapterHttpClient()
                         .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
                 // Handle the response when the CompletableFuture completes
-                responseFuture.thenAcceptAsync(response -> {
-                    log.debug("ProcessID: {} - Response body: {}", processId, response.body());
-                    // Add any additional response handling logic here
-                    // todo if response.statusCode() != 200 then throw exception
-                }).join(); // Use join() to wait for the CompletableFuture to complete
+                responseFuture.thenAcceptAsync(response -> log.debug("ProcessID: {} - Response body: {}", processId, response.body())).join(); // Use join() to wait for the CompletableFuture to complete
                 log.debug("ProcessID: {} - On-Chain Event published successfully into Blockchain Node", processId);
             } catch (JsonProcessingException e) {
                 log.error("ProcessID: {} - Error publishing On-Chain Event into Blockchain Node: {}", processId, e.getMessage());

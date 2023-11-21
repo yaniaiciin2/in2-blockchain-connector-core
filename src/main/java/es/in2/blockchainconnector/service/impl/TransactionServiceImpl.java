@@ -22,4 +22,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .doOnError(error -> log.error("ProcessID: {} - Error saving transaction: {}", processId, error.getMessage()));
     }
 
+    public Mono<Transaction> updateTransaction(Transaction transaction) {
+        String processId = MDC.get("processId");
+        return transactionRepository.save(transaction)
+                .doOnError(error -> log.error("ProcessID: {} - Error updating transaction: {}", processId, error.getMessage()));
+    }
+
 }
