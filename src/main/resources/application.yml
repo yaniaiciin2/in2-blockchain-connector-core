@@ -8,31 +8,21 @@ spring:
     import:
       - classpath:external-config.yml
       - file:/src/main/resources/external-config.yml
-  datasource:
+  r2dbc:
     url: ${DATABASE_URL}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: user
-    password: 1234
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    open-in-view: false
-    properties:
-      jakarta.persistence.sharedCache.mode: UNSPECIFIED
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    generate-ddl: true
+    username: postgres #user
+    password: postgres #1234
+    generate-unique-name: true
   flyway:
-    baselineOnMigrate: true
-    locations: classpath:db/migrations
+    url: ${FLYWAY_URL}
+    locations: classpath:db/postgres/migration
 
 # Spring Logging Configuration
-# Logging Configuration
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
-    es.in2.blockchainconnector: DEBUG
+    es.in2.blockchainconnector: INFO
 
 # Spring Management Configuration - Actuator
 management:

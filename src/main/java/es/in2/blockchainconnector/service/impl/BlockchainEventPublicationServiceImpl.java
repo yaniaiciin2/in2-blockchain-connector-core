@@ -9,6 +9,7 @@ import es.in2.blockchainconnector.configuration.properties.DLTAdapterProperties;
 import es.in2.blockchainconnector.exception.DLTAdapterCommunicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -31,13 +32,14 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
 
     @Override
     public Mono<Void> publishBlockchainEventIntoBlockchainNode(OnChainEvent onChainEvent) {
+        String processId = MDC.get("processId");
         return Mono.fromRunnable(() -> {
             try {
-                log.debug("Publishing On-Chain Event into Blockchain Node...");
+                log.debug("ProcessID: {} - Publishing On-Chain Event into Blockchain Node...", processId);
                 URI uri = URI.create(dltAdapterProperties.domain() + dltAdapterProperties.paths().publish());
-                log.debug("URI: {}", uri);
+                log.debug("ProcessID: {} - URI: {}", processId, uri);
                 String requestBody = objectMapper.writeValueAsString(onChainEvent);
-                log.debug("Request Body: {}", requestBody);
+                log.debug("ProcessID: {} - Request Body: {}", processId, requestBody);
                 HttpRequest httpRequest = HttpRequest.newBuilder()
                         .uri(uri)
                         .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -47,14 +49,13 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                         .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
                 // Handle the response when the CompletableFuture completes
                 responseFuture.thenAcceptAsync(response -> {
-                    log.info("Response status code: {}", response.statusCode());
-                    log.info("Response body: {}", response.body());
+                    log.debug("ProcessID: {} - Response body: {}", processId, response.body());
                     // Add any additional response handling logic here
                     // todo if response.statusCode() != 200 then throw exception
                 }).join(); // Use join() to wait for the CompletableFuture to complete
-                log.debug("On-Chain Event published successfully into Blockchain Node");
+                log.debug("ProcessID: {} - On-Chain Event published successfully into Blockchain Node", processId);
             } catch (JsonProcessingException e) {
-                log.error("Error publishing On-Chain Event into Blockchain Node: {}", e.getMessage(), e);
+                log.error("ProcessID: {} - Error publishing On-Chain Event into Blockchain Node: {}", processId, e.getMessage());
                 throw new DLTAdapterCommunicationException("Failed to publish On-Chain Event into Blockchain Node", e);
             }
         });

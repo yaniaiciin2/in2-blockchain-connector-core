@@ -9,6 +9,7 @@ import es.in2.blockchainconnector.service.BlockchainEventCreationService;
 import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -29,9 +30,10 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
 
     @Override
     public Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO) {
+        String processId = MDC.get("processId");
         return Mono.fromCallable(() -> {
             try {
-                log.debug(" > Creating blockchain event...");
+                log.debug("ProcessID: {} - Creating blockchain event...", processId);
                 String entityHashed;
                 if (onChainEventDTO.dataMap().containsKey("deletedAt")) {
                     // Calculate SHA-256 hash from origin data
@@ -53,13 +55,13 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
-                log.debug("OnChainEvent created: {}", onChainEvent);
+                log.debug("ProcessID: {} - OnChainEvent created: {}", processId, onChainEvent);
                 return onChainEvent;
             } catch (NoSuchAlgorithmException e) {
-                log.error("Error creating blockchain event: {}", e.getMessage(), e);
-                throw new HashLinkException("Error creating blockchain event", e);
+                log.error("ProcessID: {} - Error creating blockchain event: {}", processId, e.getMessage());
+                throw new HashLinkException("Error creating blockchain event", e.getCause());
             }
-        }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e));
+        }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
     }
 
 }

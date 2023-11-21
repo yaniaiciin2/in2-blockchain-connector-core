@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AuditStatus {
-    RECEIVED("RECEIVED"),
-    PUBLISHED("PUBLISHED"),
-    CREATED("CREATED");
+public enum TransactionStatus {
+    RECEIVED("notified"),
+    CREATED("created"),
+    RETRIEVED("retrieved"),
+    PUBLISHED("published");
 
     private final String description;
 }
