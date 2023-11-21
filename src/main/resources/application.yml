@@ -15,7 +15,7 @@ spring:
     generate-unique-name: true
   flyway:
     url: ${FLYWAY_URL}
-    locations: classpath:db/postgres/migration
+    locations: classpath:db/migrations
 
 # Spring Logging Configuration
 logging:

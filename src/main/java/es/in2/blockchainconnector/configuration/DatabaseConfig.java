@@ -14,11 +14,7 @@ class DatabaseConfig {
     @Bean(initMethod = "migrate")
     public Flyway flyway(FlywayProperties flywayProperties, R2dbcProperties r2dbcProperties) {
         return Flyway.configure()
-                .dataSource(
-                        flywayProperties.getUrl(),
-                        r2dbcProperties.getUsername(),
-                        r2dbcProperties.getPassword()
-                )
+                .dataSource(flywayProperties.getUrl(), r2dbcProperties.getUsername(), r2dbcProperties.getPassword())
                 .locations(flywayProperties.getLocations().toArray(String[]::new))
                 .baselineOnMigrate(true)
                 .load();

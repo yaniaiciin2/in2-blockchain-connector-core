@@ -58,6 +58,7 @@ public class BrokerAdapterNotificationServiceImpl implements BrokerAdapterNotifi
                         .status(TransactionStatus.RECEIVED)
                         .trader(TransactionTrader.PRODUCER)
                         .hash("")
+                        .newTransaction(true)
                         .build();
                 return transactionService.saveTransaction(transaction)
                         // Return the OnChainEventDTO after the transaction is saved
