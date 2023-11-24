@@ -2,19 +2,23 @@ package es.in2.blockchainconnector.service.impl;
 
 import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
-import es.in2.blockchainconnector.domain.OnChainEvent;
-import es.in2.blockchainconnector.domain.OnChainEventDTO;
+import es.in2.blockchainconnector.domain.*;
 import es.in2.blockchainconnector.exception.HashLinkException;
 import es.in2.blockchainconnector.service.BlockchainEventCreationService;
+import es.in2.blockchainconnector.service.TransactionService;
 import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.net.http.HttpResponse;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static es.in2.blockchainconnector.utils.Utils.HASHLINK_PREFIX;
 import static es.in2.blockchainconnector.utils.Utils.getRequest;
@@ -26,12 +30,14 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
 
     private final OperatorProperties operatorProperties;
     private final BrokerProperties brokerProperties;
+    private final TransactionService transactionService;
 
     @Override
     public Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO) {
+        String processId = MDC.get("processId");
         return Mono.fromCallable(() -> {
             try {
-                log.debug(" > Creating blockchain event...");
+                log.debug("ProcessID: {} - Creating blockchain event...", processId);
                 String entityHashed;
                 if (onChainEventDTO.dataMap().containsKey("deletedAt")) {
                     // Calculate SHA-256 hash from origin data
@@ -53,13 +59,32 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
-                log.debug("OnChainEvent created: {}", onChainEvent);
+                log.debug("ProcessID: {} - OnChainEvent created: {}", processId, onChainEvent);
                 return onChainEvent;
             } catch (NoSuchAlgorithmException e) {
-                log.error("Error creating blockchain event: {}", e.getMessage(), e);
-                throw new HashLinkException("Error creating blockchain event", e);
+                log.error("ProcessID: {} - Error creating blockchain event: {}", processId, e.getMessage());
+                throw new HashLinkException("Error creating blockchain event", e.getCause());
             }
-        }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e));
+        }).flatMap(onChainEvent -> {
+            Transaction transaction;
+            try {
+                transaction = Transaction.builder()
+                        .id(UUID.randomUUID())
+                        .transactionId(processId)
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .dataLocation(onChainEvent.dataLocation())
+                        .entityId(onChainEventDTO.id())
+                        .entityHash(Utils.calculateSHA256Hash(onChainEventDTO.data()))
+                        .status(TransactionStatus.CREATED)
+                        .trader(TransactionTrader.PRODUCER)
+                        .hash("")
+                        .newTransaction(true)
+                        .build();
+            } catch (NoSuchAlgorithmException e) {
+                return Mono.error(new HashLinkException("Error calculating hash"));
+            }
+            return transactionService.saveTransaction(transaction).thenReturn(onChainEvent);
+                }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
     }
 
 }

@@ -1,44 +1,66 @@
 package es.in2.blockchainconnector.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.envers.Audited;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
-@Entity
-@Table(name = "transactions")
-@EntityListeners(AuditingEntityListener.class)
 @Data
-@Audited
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Transaction {
+@Table("transactions")
+public class Transaction implements Persistable<UUID> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "BINARY(16)")
+    @Column("id")
     private UUID id;
 
-    @Audited
-    private String entityId;
+    @Column("transaction_id")
+    private String transactionId;
 
-    @Audited
+    @Column("created_at")
+    private Timestamp createdAt;
+
+    @Column("data_location")
     private String dataLocation;
 
-    @CreatedBy
-    private String createdBy;
+    @Column("entity_id")
+    private String entityId;
 
-    @Audited
-    private String status;
-
-    @Audited
+    @Column("entity_hash")
     private String entityHash;
+
+    @Column("status")
+    private TransactionStatus status;
+
+    @Column("trader")
+    private TransactionTrader trader;
+
+    @Column("hash")
+    private String hash;
+
+    @Transient
+    private boolean newTransaction;
+
+    @Override
+    @Transient
+    public boolean isNew() {
+        return this.newTransaction || id == null;
+    }
+
+    public Transaction setAsNew() {
+        this.newTransaction = true;
+        return this;
+    }
 
 }
