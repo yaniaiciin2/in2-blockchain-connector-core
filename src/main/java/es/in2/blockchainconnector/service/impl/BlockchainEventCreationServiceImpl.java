@@ -74,10 +74,10 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                         .createdAt(Timestamp.from(Instant.now()))
                         .dataLocation(onChainEvent.dataLocation())
                         .entityId(onChainEventDTO.id())
-                        .entityHash("")
+                        .entityHash(Utils.calculateSHA256Hash(onChainEventDTO.data()))
                         .status(TransactionStatus.CREATED)
                         .trader(TransactionTrader.PRODUCER)
-                        .hash(Utils.calculateSHA256Hash(onChainEventDTO.data()))
+                        .hash("")
                         .newTransaction(true)
                         .build();
             } catch (NoSuchAlgorithmException e) {
