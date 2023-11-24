@@ -30,5 +30,4 @@ public class BlockchainCreationAndPublicationServiceImplFacade implements Blockc
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Blockchain Event published successfully", processId))
                 .doOnError(error -> log.error("Error creating or publishing Blockchain Event: {}", error.getMessage(), error));
     }
-    
 }

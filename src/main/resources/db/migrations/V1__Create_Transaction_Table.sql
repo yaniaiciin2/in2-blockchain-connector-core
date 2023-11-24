@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS transactions
 (
     id uuid PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
+    transaction_id varchar(256),
     created_at TIMESTAMP NOT NULL,
     data_location varchar(256),
     entity_id varchar(256),

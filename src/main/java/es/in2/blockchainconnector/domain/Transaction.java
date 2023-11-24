@@ -25,6 +25,9 @@ public class Transaction implements Persistable<UUID> {
     @Column("id")
     private UUID id;
 
+    @Column("transaction_id")
+    private String transactionId;
+
     @Column("created_at")
     private Timestamp createdAt;
 
