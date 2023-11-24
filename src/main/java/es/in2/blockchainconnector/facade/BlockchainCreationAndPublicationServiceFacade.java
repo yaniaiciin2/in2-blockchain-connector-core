@@ -1,4 +1,4 @@
-package es.in2.blockchainconnector.service;
+package es.in2.blockchainconnector.facade;
 
 import es.in2.blockchainconnector.domain.BrokerNotificationDTO;
 import reactor.core.publisher.Mono;

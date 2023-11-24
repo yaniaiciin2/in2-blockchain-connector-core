@@ -1,7 +1,7 @@
 package es.in2.blockchainconnector.controller;
 
 import es.in2.blockchainconnector.domain.BrokerNotificationDTO;
-import es.in2.blockchainconnector.service.BlockchainCreationAndPublicationServiceFacade;
+import es.in2.blockchainconnector.facade.BlockchainCreationAndPublicationServiceFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;

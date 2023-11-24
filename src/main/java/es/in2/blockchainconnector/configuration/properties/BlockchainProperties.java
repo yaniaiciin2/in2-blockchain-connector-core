@@ -4,6 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
+import java.util.Optional;
+
 /**
  * Configuration to connect the blockchain
  *
@@ -20,7 +22,7 @@ public record BlockchainProperties(String rpcAddress, String userEthereumAddress
                                 BlockchainSubscriptionConfigProperties subscription) {
         this.rpcAddress = rpcAddress;
         this.userEthereumAddress = userEthereumAddress;
-        this.subscription = subscription;
+        this.subscription = Optional.ofNullable(subscription).orElse(new BlockchainSubscriptionConfigProperties(null, false, null));
     }
 
 }

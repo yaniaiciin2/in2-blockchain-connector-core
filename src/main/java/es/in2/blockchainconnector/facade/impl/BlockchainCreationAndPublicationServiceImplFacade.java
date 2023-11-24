@@ -1,8 +1,10 @@
-package es.in2.blockchainconnector.service.impl;
+package es.in2.blockchainconnector.facade.impl;
 
 import es.in2.blockchainconnector.domain.BrokerNotificationDTO;
-import es.in2.blockchainconnector.domain.Transaction;
-import es.in2.blockchainconnector.service.*;
+import es.in2.blockchainconnector.facade.BlockchainCreationAndPublicationServiceFacade;
+import es.in2.blockchainconnector.service.BlockchainEventCreationService;
+import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
+import es.in2.blockchainconnector.service.BrokerAdapterNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -17,7 +19,6 @@ public class BlockchainCreationAndPublicationServiceImplFacade implements Blockc
     private final BrokerAdapterNotificationService brokerAdapterNotificationService;
     private final BlockchainEventCreationService blockchainEventCreationService;
     private final BlockchainEventPublicationService blockchainEventPublicationService;
-    private final TransactionService transactionService;
 
     @Override
     public Mono<Void> createAndPublishABlockchainEventIntoBlockchainNode(BrokerNotificationDTO brokerNotificationDTO) {

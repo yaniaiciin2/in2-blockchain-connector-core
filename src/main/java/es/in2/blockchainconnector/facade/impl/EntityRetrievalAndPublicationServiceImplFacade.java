@@ -1,6 +1,7 @@
-package es.in2.blockchainconnector.service.impl;
+package es.in2.blockchainconnector.facade.impl;
 
 import es.in2.blockchainconnector.domain.DLTNotificationDTO;
+import es.in2.blockchainconnector.facade.EntityRetrievalAndPublicationServiceFacade;
 import es.in2.blockchainconnector.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

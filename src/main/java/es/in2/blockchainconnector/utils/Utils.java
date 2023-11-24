@@ -1,7 +1,5 @@
 package es.in2.blockchainconnector.utils;
 
-import es.in2.blockchainconnector.exception.RequestErrorException;
-import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
-import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -21,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 public class Utils {
 
     public static final String SHA_256_ALGORITHM = "SHA-256";
-    public static final String PACKAGE_TO_SCAN = "es.in2.blockchainconnector.domain";
     public static final String HASHLINK_PREFIX = "?hl=";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String APPLICATION_JSON = "application/json";
