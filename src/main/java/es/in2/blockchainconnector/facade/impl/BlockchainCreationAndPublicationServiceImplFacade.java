@@ -25,9 +25,9 @@ public class BlockchainCreationAndPublicationServiceImplFacade implements Blockc
         String processId = MDC.get("processId");
         return brokerAdapterNotificationService.processNotification(brokerNotificationDTO)
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Broker Notification processed successfully", processId))
-                .flatMap(blockchainEventCreationService::createBlockchainEvent)
+                .flatMap(onchainEventDTO -> blockchainEventCreationService.createBlockchainEvent(onchainEventDTO, processId))
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Blockchain Event created successfully", processId))
-                .flatMap(blockchainEventPublicationService::publishBlockchainEventIntoBlockchainNode)
+                .flatMap(onchainEvent -> blockchainEventPublicationService.publishBlockchainEventIntoBlockchainNode(onchainEvent, processId))
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Blockchain Event published successfully", processId))
                 .doOnError(error -> log.error("Error creating or publishing Blockchain Event: {}", error.getMessage(), error));
     }

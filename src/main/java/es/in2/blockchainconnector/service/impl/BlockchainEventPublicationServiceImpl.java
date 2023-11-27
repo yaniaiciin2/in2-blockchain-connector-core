@@ -43,8 +43,7 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
     private final TransactionService transactionService;
 
     @Override
-    public Mono<Void> publishBlockchainEventIntoBlockchainNode(OnChainEvent onChainEvent) {
-        String processId = MDC.get("processId");
+    public Mono<Void> publishBlockchainEventIntoBlockchainNode(OnChainEvent onChainEvent, String processId) {
         return Mono.fromCallable(() -> {
                     try {
                         log.debug("ProcessID: {} - Publishing On-Chain Event into Blockchain Node...", processId);

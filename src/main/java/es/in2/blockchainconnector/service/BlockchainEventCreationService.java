@@ -5,5 +5,5 @@ import es.in2.blockchainconnector.domain.OnChainEventDTO;
 import reactor.core.publisher.Mono;
 
 public interface BlockchainEventCreationService {
-    Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO);
+    Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO, String processId);
 }
