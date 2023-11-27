@@ -42,7 +42,6 @@ repositories {
 }
 
 dependencies {
-
 	// Spring Boot dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -89,7 +88,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 	testImplementation 'org.mockito:mockito-core:3.12.4'
 	testImplementation 'io.mockk:mockk:1.13.5'
-
 }
 
 tasks.named('compileJava') {
@@ -112,6 +110,12 @@ tasks.jacocoTestReport {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
 					'**/BlockchainConnectorApplication.class',
+					'**/configuration/**',
+					'**/domain/**',
+					'**/exception/**',
+					'**/repository/**',
+					'**/utils/**',
+
 			])
 		}))
 	}

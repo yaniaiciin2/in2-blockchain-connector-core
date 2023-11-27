@@ -14,7 +14,6 @@ import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
 import es.in2.blockchainconnector.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -43,7 +42,7 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
     private final TransactionService transactionService;
 
     @Override
-    public Mono<Void> publishBlockchainEventIntoBlockchainNode(OnChainEvent onChainEvent, String processId) {
+    public Mono<Void> publishBlockchainEventIntoBlockchainNode(String processId, OnChainEvent onChainEvent) {
         return Mono.fromCallable(() -> {
                     try {
                         log.debug("ProcessID: {} - Publishing On-Chain Event into Blockchain Node...", processId);
@@ -83,8 +82,6 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                 .doOnError(error -> log.error("Error publishing On-Chain Event into Blockchain Node: {}", error.getMessage(), error))
                 .then();
     }
-
-
 
     private static String extractEntityId(String entityUrl) {
         try {

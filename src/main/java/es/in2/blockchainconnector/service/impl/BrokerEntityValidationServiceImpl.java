@@ -10,7 +10,6 @@ import reactor.core.publisher.Mono;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import static es.in2.blockchainconnector.utils.Utils.HASHLINK_PREFIX;
 import static es.in2.blockchainconnector.utils.Utils.calculateSHA256Hash;
 
 @Slf4j

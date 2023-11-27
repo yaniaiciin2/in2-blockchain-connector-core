@@ -54,7 +54,7 @@ class BlockchainEventCreationServiceImplTest {
         when(transactionService.saveTransaction(any())).thenReturn(Mono.empty());
 
         // Act
-        Mono<OnChainEvent> resultMono = service.createBlockchainEvent(onChainEventDTO, processId);
+        Mono<OnChainEvent> resultMono = service.createBlockchainEvent(processId, onChainEventDTO);
 
         // Assert
         OnChainEvent result = resultMono.block(); // Blocks until the Mono is completed

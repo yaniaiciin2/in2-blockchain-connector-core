@@ -1,7 +1,6 @@
 package es.in2.blockchainconnector.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.domain.DLTNotificationDTO;
@@ -13,7 +12,6 @@ import es.in2.blockchainconnector.service.BrokerEntityRetrievalService;
 import es.in2.blockchainconnector.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -38,14 +36,13 @@ public class BrokerEntityRetrievalServiceImpl implements BrokerEntityRetrievalSe
     private final ObjectMapper objectMapper;
 
     @Override
-    public Mono<String> retrieveEntityFromSourceBroker(DLTNotificationDTO dltNotificationDTO, String processId) {
+    public Mono<String> retrieveEntityFromSourceBroker(String processId, DLTNotificationDTO dltNotificationDTO) {
         // Retrieve one of the entities from the broker
         return Mono.defer(() -> {
             // Get URL from the DLTNotificationDTO.dataLocation()
             String sourceBrokerEntityURL = Arrays.stream(dltNotificationDTO.dataLocation().split("\\?hl="))
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
-
             // Execute a GET request to the Source Context Broker
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -53,30 +50,27 @@ public class BrokerEntityRetrievalServiceImpl implements BrokerEntityRetrievalSe
                     .headers(ACCEPT_HEADER, APPLICATION_JSON)
                     .GET()
                     .build();
-
-
             // Send request asynchronously
             return Mono.fromFuture(() -> client.sendAsync(request, HttpResponse.BodyHandlers.ofString()))
                     .flatMap(response -> {
                         try {
-                        JsonNode jsonNode = objectMapper.readTree(response.body());
-                        String entityId = jsonNode.get("id").asText();
-                        // Create and save transaction after receiving the response
-                        Transaction transaction = Transaction.builder()
-                                .id(UUID.randomUUID())
-                                .transactionId(processId)
-                                .createdAt(Timestamp.from(Instant.now()))
-                                .dataLocation(dltNotificationDTO.dataLocation())
-                                .entityId(entityId)
-                                .entityHash("")
-                                .status(TransactionStatus.RETRIEVED)
-                                .trader(TransactionTrader.CONSUMER)
-                                .hash("")
-                                .newTransaction(true)
-                                .build();
-
-                        return transactionService.saveTransaction(transaction)
-                                .thenReturn(response.body());
+                            JsonNode jsonNode = objectMapper.readTree(response.body());
+                            String entityId = jsonNode.get("id").asText();
+                            // Create and save transaction after receiving the response
+                            Transaction transaction = Transaction.builder()
+                                    .id(UUID.randomUUID())
+                                    .transactionId(processId)
+                                    .createdAt(Timestamp.from(Instant.now()))
+                                    .dataLocation(dltNotificationDTO.dataLocation())
+                                    .entityId(entityId)
+                                    .entityHash("")
+                                    .status(TransactionStatus.RETRIEVED)
+                                    .trader(TransactionTrader.CONSUMER)
+                                    .hash("")
+                                    .newTransaction(true)
+                                    .build();
+                            return transactionService.saveTransaction(transaction)
+                                    .thenReturn(response.body());
                         } catch (JsonProcessingException e) {
                             return Mono.error(new JsonReadingException("Error while extracting data from entity"));
                         }

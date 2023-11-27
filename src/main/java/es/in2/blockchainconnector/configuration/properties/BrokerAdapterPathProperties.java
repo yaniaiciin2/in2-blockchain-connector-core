@@ -4,7 +4,8 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.util.Optional;
 
-public record BrokerAdapterPathProperties(String entities, String subscribe, String publish, String update, String delete) {
+public record BrokerAdapterPathProperties(String entities, String subscribe, String publish, String update,
+                                          String delete) {
 
     @ConstructorBinding
     public BrokerAdapterPathProperties(String entities, String subscribe, String publish, String update, String delete) {

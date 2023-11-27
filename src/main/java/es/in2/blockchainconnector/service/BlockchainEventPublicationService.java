@@ -4,5 +4,5 @@ import es.in2.blockchainconnector.domain.OnChainEvent;
 import reactor.core.publisher.Mono;
 
 public interface BlockchainEventPublicationService {
-    Mono<Void> publishBlockchainEventIntoBlockchainNode(OnChainEvent onChainEvent, String processId);
+    Mono<Void> publishBlockchainEventIntoBlockchainNode(String processId, OnChainEvent onChainEvent);
 }

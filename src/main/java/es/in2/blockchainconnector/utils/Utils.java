@@ -43,7 +43,6 @@ public class Utils {
                 .headers(ACCEPT_HEADER, APPLICATION_JSON)
                 .DELETE()
                 .build();
-
         // Send request asynchronously
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
@@ -65,7 +64,6 @@ public class Utils {
     }
 
 
-
     public static String postRequest(String url, String requestBody) {
         // Create request
         HttpClient client = HttpClient.newHttpClient();
@@ -83,10 +81,8 @@ public class Utils {
                 .headers(CONTENT_TYPE, APPLICATION_JSON, ACCEPT_HEADER, APPLICATION_JSON)
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
-
         // Send request asynchronously
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
         // Wait for the response and return the body
         return response.thenApply(HttpResponse::body).join();
     }

@@ -8,17 +8,18 @@ import java.util.Optional;
 
 /**
  * Configuration to connect with the orion-ld-adapter.
+ *
  * @param domain - domain of the adapter
- * @param paths - paths to be used with that adapter instance
+ * @param paths  - paths to be used with that adapter instance
  */
 @ConfigurationProperties(prefix = "broker-adapter")
 public record BrokerAdapterProperties(String domain, @NestedConfigurationProperty BrokerAdapterPathProperties paths) {
 
-	@ConstructorBinding
-	public BrokerAdapterProperties(String domain, BrokerAdapterPathProperties paths) {
-		this.domain = domain;
-		this.paths = Optional.ofNullable(paths).orElse(new BrokerAdapterPathProperties(null, null, null, null, null));
-	}
+    @ConstructorBinding
+    public BrokerAdapterProperties(String domain, BrokerAdapterPathProperties paths) {
+        this.domain = domain;
+        this.paths = Optional.ofNullable(paths).orElse(new BrokerAdapterPathProperties(null, null, null, null, null));
+    }
 
 }
 

@@ -1,6 +1,5 @@
 package es.in2.blockchainconnector.service.impl;
 
-import com.sun.jdi.VoidValue;
 import es.in2.blockchainconnector.domain.DLTNotificationDTO;
 import es.in2.blockchainconnector.domain.Transaction;
 import es.in2.blockchainconnector.domain.TransactionStatus;
@@ -28,32 +27,30 @@ public class DltAdapterNotificationServiceImpl implements DltAdapterNotification
     public Mono<Void> processNotification(DLTNotificationDTO dltNotificationDTO) {
         String processId = MDC.get("processId");
         return Mono.fromCallable(() -> {
-            try {
-                // Validate input
-                if (dltNotificationDTO == null || dltNotificationDTO.dataLocation().isEmpty()) {
-                    throw new IllegalArgumentException("Invalid DLT Notification");
-                }
-
-                // Build transaction
-                Transaction transaction = Transaction.builder()
-                        .id(UUID.randomUUID())
-                        .transactionId(processId)
-                        .createdAt(Timestamp.from(Instant.now()))
-                        .dataLocation(dltNotificationDTO.dataLocation())
-                        .entityId("")
-                        .entityHash("")
-                        .status(TransactionStatus.RECEIVED)
-                        .trader(TransactionTrader.CONSUMER)
-                        .newTransaction(true)
-                        .build();
-
-                // Save transaction and ignore the result
-                return transactionService.saveTransaction(transaction).then();
-            } catch (Exception e) {
-                log.error("Error processing DLT Notification: {}", e.getMessage(), e);
-                throw e;
-            }
-        }).flatMap(mono -> mono)
+                    try {
+                        // Validate input
+                        if (dltNotificationDTO == null || dltNotificationDTO.dataLocation().isEmpty()) {
+                            throw new IllegalArgumentException("Invalid DLT Notification");
+                        }
+                        // Build transaction
+                        Transaction transaction = Transaction.builder()
+                                .id(UUID.randomUUID())
+                                .transactionId(processId)
+                                .createdAt(Timestamp.from(Instant.now()))
+                                .dataLocation(dltNotificationDTO.dataLocation())
+                                .entityId("")
+                                .entityHash("")
+                                .status(TransactionStatus.RECEIVED)
+                                .trader(TransactionTrader.CONSUMER)
+                                .newTransaction(true)
+                                .build();
+                        // Save transaction and ignore the result
+                        return transactionService.saveTransaction(transaction).then();
+                    } catch (Exception e) {
+                        log.error("Error processing DLT Notification: {}", e.getMessage(), e);
+                        throw e;
+                    }
+                }).flatMap(mono -> mono)
                 .doOnError(error -> log.error("Error processing DLT Notification: {}", error.getMessage(), error));
     }
 

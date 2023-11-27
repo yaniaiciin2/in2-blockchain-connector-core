@@ -39,46 +39,41 @@ public class BrokerEntityPublicationServiceImpl implements BrokerEntityPublicati
     private final TransactionService transactionService;
 
     @Override
-    public Mono<Void> publishOrDeleteAnEntityIntoContextBroker(DLTNotificationDTO dltNotificationDTO, String validatedEntity, String processId) {
-        if(checkIfDeleted(validatedEntity)) {
+    public Mono<Void> publishOrDeleteAnEntityIntoContextBroker(String processId, DLTNotificationDTO dltNotificationDTO, String validatedEntity) {
+        if (checkIfDeleted(validatedEntity)) {
             try {
-                return handleDeletedEntity(dltNotificationDTO, validatedEntity, processId);
+                return handleDeletedEntity(processId, dltNotificationDTO, validatedEntity);
             } catch (NoSuchAlgorithmException e) {
                 throw new InvalidHashlinkComparisonException("Error while calculating hash");
             }
         }
-
-        return handleBrokerResponse(validatedEntity, dltNotificationDTO, processId);
+        return handleBrokerResponse(processId, validatedEntity, dltNotificationDTO);
     }
 
-    private Mono<Void> handleBrokerResponse(String validatedEntity, DLTNotificationDTO dltNotificationDTO, String processId) {
+    private Mono<Void> handleBrokerResponse(String processId, String validatedEntity, DLTNotificationDTO dltNotificationDTO) {
         try {
             // Depending on the status code it will decide if update or publish
             CompletableFuture<HttpResponse<String>> retrievedEntity = getRequest(brokerAdapterProperties.domain() +
                     brokerAdapterProperties.paths().entities() +
                     "/" + extractIdFromEntity(validatedEntity));
-
             int responseCode = retrievedEntity.thenApply(HttpResponse::statusCode).join();
-
             if (responseCode == 200) {
                 log.info(" > Entity exists");
-                return updateEntityToBroker(validatedEntity, dltNotificationDTO, processId);
+                return updateEntityToBroker(processId, validatedEntity, dltNotificationDTO);
             } else if (responseCode == 404) {
                 log.info(" > Entity doesn't exist");
-                return publishEntityToBroker(validatedEntity, dltNotificationDTO, processId);
+                return publishEntityToBroker(processId, validatedEntity, dltNotificationDTO);
             } else {
                 log.warn("Unhandled response status code: {}", responseCode);
                 return Mono.error(new RequestErrorException("Unhandled response status code: " + responseCode));
             }
-
-
         } catch (Exception e) {
             log.error("Error handling response", e);
             return Mono.error(e);
         }
     }
 
-    private Mono<Void> handleDeletedEntity(DLTNotificationDTO dltNotificationDTO, String validatedEntity, String processId) throws NoSuchAlgorithmException {
+    private Mono<Void> handleDeletedEntity(String processId, DLTNotificationDTO dltNotificationDTO, String validatedEntity) throws NoSuchAlgorithmException {
         Transaction transaction = Transaction.builder()
                 .id(UUID.randomUUID())
                 .transactionId(processId)
@@ -97,8 +92,7 @@ public class BrokerEntityPublicationServiceImpl implements BrokerEntityPublicati
                 .orElseThrow(IllegalArgumentException::new);
         int responseCode = deleteRequest(brokerAdapterProperties.domain() + brokerAdapterProperties.paths().delete()
                 + "/" + sourceBrokerEntityID).thenApply(HttpResponse::statusCode).join();
-
-        if(responseCode == 204) {
+        if (responseCode == 204) {
             log.debug("Entity deleted successfully");
             return transactionService.saveTransaction(transaction).then();
         } else {
@@ -130,7 +124,7 @@ public class BrokerEntityPublicationServiceImpl implements BrokerEntityPublicati
     }
 
 
-    private Mono<Void> publishEntityToBroker(String brokerEntity, DLTNotificationDTO dltNotificationDTO, String processId) throws NoSuchAlgorithmException {
+    private Mono<Void> publishEntityToBroker(String processId, String brokerEntity, DLTNotificationDTO dltNotificationDTO) throws NoSuchAlgorithmException {
         // Publish the entity to the broker
         String orionLdEntitiesUrl = brokerProperties.internalDomain() + brokerProperties.paths().entities();
         log.debug(" > Publishing entity to: {}", orionLdEntitiesUrl);
@@ -147,13 +141,12 @@ public class BrokerEntityPublicationServiceImpl implements BrokerEntityPublicati
                 .hash("")
                 .newTransaction(true)
                 .build();
-
         return Mono.fromRunnable(() -> postRequest(orionLdEntitiesUrl, brokerEntity))
                 .then(Mono.defer(() -> transactionService.saveTransaction(transaction)))
                 .then();
     }
 
-    private Mono<Void> updateEntityToBroker(String brokerEntity, DLTNotificationDTO dltNotificationDTO, String processId) throws NoSuchAlgorithmException {
+    private Mono<Void> updateEntityToBroker(String processId, String brokerEntity, DLTNotificationDTO dltNotificationDTO) throws NoSuchAlgorithmException {
         // Update the entity to the broker
         String brokerUpdateEntitiesUrl = brokerAdapterProperties.domain() + brokerAdapterProperties.paths().update();
         log.debug(" > Updating entity to {}", brokerUpdateEntitiesUrl);

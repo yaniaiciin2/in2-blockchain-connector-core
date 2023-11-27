@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BlockchainCreationAndPublicationServiceImplFacade implements BlockchainCreationAndPublicationServiceFacade {
+public class BlockchainCreationAndPublicationServiceFacadeImpl implements BlockchainCreationAndPublicationServiceFacade {
 
     private final BrokerAdapterNotificationService brokerAdapterNotificationService;
     private final BlockchainEventCreationService blockchainEventCreationService;
@@ -25,10 +25,11 @@ public class BlockchainCreationAndPublicationServiceImplFacade implements Blockc
         String processId = MDC.get("processId");
         return brokerAdapterNotificationService.processNotification(brokerNotificationDTO)
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Broker Notification processed successfully", processId))
-                .flatMap(onchainEventDTO -> blockchainEventCreationService.createBlockchainEvent(onchainEventDTO, processId))
+                .flatMap(onchainEventDTO -> blockchainEventCreationService.createBlockchainEvent(processId, onchainEventDTO))
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Blockchain Event created successfully", processId))
-                .flatMap(onchainEvent -> blockchainEventPublicationService.publishBlockchainEventIntoBlockchainNode(onchainEvent, processId))
+                .flatMap(onchainEvent -> blockchainEventPublicationService.publishBlockchainEventIntoBlockchainNode(processId, onchainEvent))
                 .doOnSuccess(voidValue -> log.info("ProcessID: {} - Blockchain Event published successfully", processId))
                 .doOnError(error -> log.error("Error creating or publishing Blockchain Event: {}", error.getMessage(), error));
     }
+
 }

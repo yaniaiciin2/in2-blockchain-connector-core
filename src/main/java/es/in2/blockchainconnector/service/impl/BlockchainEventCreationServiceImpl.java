@@ -9,7 +9,6 @@ import es.in2.blockchainconnector.service.TransactionService;
 import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -33,8 +32,9 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
     private final TransactionService transactionService;
 
     @Override
-    public Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO, String processId) {
+    public Mono<OnChainEvent> createBlockchainEvent(String processId, OnChainEventDTO onChainEventDTO) {
         return Mono.fromCallable(() -> {
+            log.info("ProcessID: {} - Processing OnChainEventDTO: {}", processId, onChainEventDTO);
             try {
                 log.debug("ProcessID: {} - Creating blockchain event...", processId);
                 String entityHashed;
@@ -83,7 +83,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                 return Mono.error(new HashLinkException("Error calculating hash"));
             }
             return transactionService.saveTransaction(transaction).thenReturn(onChainEvent);
-                }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
+        }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
     }
 
 }
