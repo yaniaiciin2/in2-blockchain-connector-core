@@ -33,8 +33,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
     private final TransactionService transactionService;
 
     @Override
-    public Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO) {
-        String processId = MDC.get("processId");
+    public Mono<OnChainEvent> createBlockchainEvent(OnChainEventDTO onChainEventDTO, String processId) {
         return Mono.fromCallable(() -> {
             try {
                 log.debug("ProcessID: {} - Creating blockchain event...", processId);

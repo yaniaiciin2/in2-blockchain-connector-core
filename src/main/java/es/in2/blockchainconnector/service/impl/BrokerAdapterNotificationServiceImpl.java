@@ -50,7 +50,8 @@ public class BrokerAdapterNotificationServiceImpl implements BrokerAdapterNotifi
                         .build();
                 // Build and save Transaction
                 Transaction transaction = Transaction.builder()
-                        .id(UUID.fromString(processId))
+                        .id(UUID.randomUUID())
+                        .transactionId(processId)
                         .createdAt(Timestamp.from(Instant.now()))
                         .dataLocation("")
                         .entityId(id)
