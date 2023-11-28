@@ -1,6 +1,6 @@
 package es.in2.blockchainconnector.service.impl;
 
-import es.in2.blockchainconnector.configuration.DLTAdapterConfig;
+import es.in2.blockchainconnector.configuration.ApplicationConfig;
 import es.in2.blockchainconnector.configuration.properties.BrokerPathProperties;
 import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
@@ -26,7 +26,7 @@ class BlockchainEventCreationServiceImplTest {
     private TransactionService transactionService;
 
     @Mock
-    private DLTAdapterConfig dltAdapterConfig;
+    private ApplicationConfig applicationConfig;
 
     @InjectMocks
     private BlockchainEventCreationServiceImpl service;
@@ -36,7 +36,7 @@ class BlockchainEventCreationServiceImplTest {
         MockitoAnnotations.openMocks(this);
         OperatorProperties operatorProperties = new OperatorProperties("VATES-878958");
         BrokerProperties brokerProperties = new BrokerProperties("http://localhost:1026", "http://localhost:1026", new BrokerPathProperties("/v2", "/entities"));
-        service = new BlockchainEventCreationServiceImpl(operatorProperties, brokerProperties, transactionService, dltAdapterConfig);
+        service = new BlockchainEventCreationServiceImpl(operatorProperties, brokerProperties, transactionService, applicationConfig);
 
     }
 

@@ -4,13 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.in2.blockchainconnector.configuration.properties.BlockchainProperties;
 import es.in2.blockchainconnector.configuration.properties.DLTAdapterProperties;
-import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
 import es.in2.blockchainconnector.domain.BlockchainNodeDTO;
 import es.in2.blockchainconnector.domain.BlockchainNodeSubscriptionDTO;
 import es.in2.blockchainconnector.exception.BlockchainNodeSubscriptionException;
-import es.in2.blockchainconnector.exception.HashCreationException;
 import es.in2.blockchainconnector.exception.RequestErrorException;
-import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +20,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.NoSuchAlgorithmException;
 
 import static es.in2.blockchainconnector.utils.Utils.APPLICATION_JSON;
 import static es.in2.blockchainconnector.utils.Utils.CONTENT_TYPE;
@@ -36,22 +32,13 @@ public class DLTAdapterConfig {
     private final ObjectMapper objectMapper;
     private final BlockchainProperties blockchainProperties;
     private final DLTAdapterProperties dltAdapterProperties;
-    private final OperatorProperties operatorProperties;
+    private final ApplicationConfig applicationConfig;
 
     @Bean
     public CookieManager cookieManager() {
         CookieManager cookieManager = new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         return cookieManager;
-    }
-
-    @Bean
-    public String organizationIdHash() {
-        try {
-            return Utils.calculateSHA256Hash(operatorProperties.organizationId());
-        } catch (NoSuchAlgorithmException e) {
-            throw new HashCreationException("Error creating organizationId hash: " + e.getMessage());
-        }
     }
 
     @Bean
@@ -80,7 +67,7 @@ public class DLTAdapterConfig {
             BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(
                     blockchainProperties.rpcAddress(),
                     blockchainProperties.userEthereumAddress(),
-                    organizationIdHash());
+                    applicationConfig.organizationIdHash());
             String body = objectMapper.writer().writeValueAsString(blockchainNodeDTO);
             log.debug(" > Blockchain Node Configuration: {}", body);
             requestCall(URI.create(url), body);

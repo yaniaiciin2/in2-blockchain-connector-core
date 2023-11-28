@@ -1,6 +1,6 @@
 package es.in2.blockchainconnector.service.impl;
 
-import es.in2.blockchainconnector.configuration.DLTAdapterConfig;
+import es.in2.blockchainconnector.configuration.ApplicationConfig;
 import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
 import es.in2.blockchainconnector.domain.*;
@@ -31,7 +31,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
     private final OperatorProperties operatorProperties;
     private final BrokerProperties brokerProperties;
     private final TransactionService transactionService;
-    private final DLTAdapterConfig dltAdapterConfig;
+    private final ApplicationConfig applicationConfig;
 
     @Override
     public Mono<OnChainEvent> createBlockchainEvent(String processId, OnChainEventDTO onChainEventDTO) {
@@ -56,7 +56,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                 // Build OnChainEvent
                 OnChainEvent onChainEvent = OnChainEvent.builder()
                         .eventType(onChainEventDTO.eventType())
-                        .organizationId(dltAdapterConfig.organizationIdHash())
+                        .organizationId(applicationConfig.organizationIdHash())
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
