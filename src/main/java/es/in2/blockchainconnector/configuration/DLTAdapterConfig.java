@@ -32,6 +32,7 @@ public class DLTAdapterConfig {
     private final ObjectMapper objectMapper;
     private final BlockchainProperties blockchainProperties;
     private final DLTAdapterProperties dltAdapterProperties;
+    private final ApplicationConfig applicationConfig;
 
     @Bean
     public CookieManager cookieManager() {
@@ -65,7 +66,8 @@ public class DLTAdapterConfig {
             log.debug(" > Blockchain Node Configuration url: {}", url);
             BlockchainNodeDTO blockchainNodeDTO = new BlockchainNodeDTO(
                     blockchainProperties.rpcAddress(),
-                    blockchainProperties.userEthereumAddress());
+                    blockchainProperties.userEthereumAddress(),
+                    applicationConfig.organizationIdHash());
             String body = objectMapper.writer().writeValueAsString(blockchainNodeDTO);
             log.debug(" > Blockchain Node Configuration: {}", body);
             requestCall(URI.create(url), body);
