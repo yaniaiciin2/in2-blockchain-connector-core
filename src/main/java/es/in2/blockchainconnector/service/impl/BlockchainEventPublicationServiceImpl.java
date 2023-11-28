@@ -12,6 +12,7 @@ import es.in2.blockchainconnector.exception.BrokerNotificationParserException;
 import es.in2.blockchainconnector.exception.DLTAdapterCommunicationException;
 import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
 import es.in2.blockchainconnector.service.TransactionService;
+import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                             .transactionId(processId)
                             .createdAt(Timestamp.from(Instant.now()))
                             .dataLocation(onChainEvent.dataLocation())
-                            .entityId(extractEntityId(onChainEvent.dataLocation()))
+                            .entityId(Utils.extractEntityId(onChainEvent.dataLocation()))
                             .entityHash(extractHlValue(onChainEvent.dataLocation()))
                             .status(TransactionStatus.PUBLISHED)
                             .trader(TransactionTrader.PRODUCER)
@@ -81,16 +82,6 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                 })
                 .doOnError(error -> log.error("Error publishing On-Chain Event into Blockchain Node: {}", error.getMessage(), error))
                 .then();
-    }
-
-    private static String extractEntityId(String entityUrl) {
-        try {
-            URI uri = new URI(entityUrl);
-            String path = uri.getPath();
-            return path.substring(path.lastIndexOf('/') + 1);
-        } catch (URISyntaxException e) {
-            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
-        }
     }
 
     public static String extractHlValue(String entityUrl) {

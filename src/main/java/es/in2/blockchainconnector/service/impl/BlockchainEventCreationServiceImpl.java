@@ -4,6 +4,7 @@ import es.in2.blockchainconnector.configuration.ApplicationConfig;
 import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
 import es.in2.blockchainconnector.domain.*;
+import es.in2.blockchainconnector.exception.HashCreationException;
 import es.in2.blockchainconnector.exception.HashLinkException;
 import es.in2.blockchainconnector.service.BlockchainEventCreationService;
 import es.in2.blockchainconnector.service.TransactionService;
@@ -58,6 +59,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                         .eventType(onChainEventDTO.eventType())
                         .organizationId(applicationConfig.organizationIdHash())
                         .dataLocation(dataLocation)
+                        .entityId(extractHashedEntityId(dataLocation))
                         .metadata(List.of())
                         .build();
                 log.debug("ProcessID: {} - OnChainEvent created: {}", processId, onChainEvent);
@@ -86,6 +88,15 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
             }
             return transactionService.saveTransaction(transaction).thenReturn(onChainEvent);
         }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
+    }
+
+    public static String extractHashedEntityId(String datalocation) {
+        String entityId = Utils.extractEntityId(datalocation);
+        try {
+            return Utils.calculateSHA256Hash(entityId);
+        } catch (NoSuchAlgorithmException e) {
+            throw new HashCreationException("Error while calculating hash to create onChainEvent");
+        }
     }
 
 }

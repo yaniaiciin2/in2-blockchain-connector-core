@@ -1,9 +1,11 @@
 package es.in2.blockchainconnector.utils;
 
+import es.in2.blockchainconnector.exception.BrokerNotificationParserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -85,6 +87,16 @@ public class Utils {
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         // Wait for the response and return the body
         return response.thenApply(HttpResponse::body).join();
+    }
+
+    public static String extractEntityId(String entityUrl) {
+        try {
+            URI uri = new URI(entityUrl);
+            String path = uri.getPath();
+            return path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
+        }
     }
 
 }
