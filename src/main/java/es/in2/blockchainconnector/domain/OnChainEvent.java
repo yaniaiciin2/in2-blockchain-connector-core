@@ -1,7 +1,6 @@
 package es.in2.blockchainconnector.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.core.util.Json;
 import lombok.Builder;
 
 import java.util.List;
@@ -11,6 +10,7 @@ public record OnChainEvent(
         @JsonProperty("eventType") String eventType,
         @JsonProperty("iss") String organizationId,
         @JsonProperty("entityId") String entityId,
+        @JsonProperty("previousEntityHash") String previousEntityHash,
         @JsonProperty("dataLocation") String dataLocation,
         @JsonProperty("relevantMetadata") List<String> metadata
 ) {

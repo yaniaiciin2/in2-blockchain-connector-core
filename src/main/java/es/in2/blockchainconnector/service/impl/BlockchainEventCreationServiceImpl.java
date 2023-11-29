@@ -62,6 +62,7 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                         .eventType(onChainEventDTO.eventType())
                         .organizationId(applicationConfig.organizationIdHash())
                         .entityId(generateEntityIdHashFromDataLocation(dataLocation))
+                        .previousEntityHash("")
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
