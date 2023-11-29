@@ -4,6 +4,8 @@ import es.in2.blockchainconnector.configuration.ApplicationConfig;
 import es.in2.blockchainconnector.configuration.properties.BrokerProperties;
 import es.in2.blockchainconnector.configuration.properties.OperatorProperties;
 import es.in2.blockchainconnector.domain.*;
+import es.in2.blockchainconnector.exception.BrokerNotificationParserException;
+import es.in2.blockchainconnector.exception.HashCreationException;
 import es.in2.blockchainconnector.exception.HashLinkException;
 import es.in2.blockchainconnector.service.BlockchainEventCreationService;
 import es.in2.blockchainconnector.service.TransactionService;
@@ -13,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
@@ -57,6 +61,8 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
                 OnChainEvent onChainEvent = OnChainEvent.builder()
                         .eventType(onChainEventDTO.eventType())
                         .organizationId(applicationConfig.organizationIdHash())
+                        .entityId(generateEntityIdHashFromDataLocation(dataLocation))
+                        .previousEntityHash("")
                         .dataLocation(dataLocation)
                         .metadata(List.of())
                         .build();
@@ -87,5 +93,18 @@ public class BlockchainEventCreationServiceImpl implements BlockchainEventCreati
             return transactionService.saveTransaction(transaction).thenReturn(onChainEvent);
         }).onErrorMap(NoSuchAlgorithmException.class, e -> new HashLinkException("Error creating blockchain event", e.getCause()));
     }
+
+    private static String generateEntityIdHashFromDataLocation(String datalocation) {
+        try {
+            URI uri = new URI(datalocation);
+            String path = uri.getPath();
+            String entityId = path.substring(path.lastIndexOf('/') + 1);
+            return Utils.calculateSHA256Hash(entityId);
+        } catch (NoSuchAlgorithmException | URISyntaxException ex) {
+            throw new HashCreationException("Error while calculating hash to create onChainEvent");
+        }
+    }
+
+
 
 }

@@ -12,6 +12,7 @@ import es.in2.blockchainconnector.exception.BrokerNotificationParserException;
 import es.in2.blockchainconnector.exception.DLTAdapterCommunicationException;
 import es.in2.blockchainconnector.service.BlockchainEventPublicationService;
 import es.in2.blockchainconnector.service.TransactionService;
+import es.in2.blockchainconnector.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,16 +84,6 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                 .then();
     }
 
-    private static String extractEntityId(String entityUrl) {
-        try {
-            URI uri = new URI(entityUrl);
-            String path = uri.getPath();
-            return path.substring(path.lastIndexOf('/') + 1);
-        } catch (URISyntaxException e) {
-            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
-        }
-    }
-
     public static String extractHlValue(String entityUrl) {
         try {
             URI uri = new URI(entityUrl);
@@ -108,6 +99,16 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
             throw new BrokerNotificationParserException("Error while extracting hl value from datalocation");
         }
         return null;
+    }
+
+    private static String extractEntityId(String entityUrl) {
+        try {
+            URI uri = new URI(entityUrl);
+            String path = uri.getPath();
+            return path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
+        }
     }
 
 }

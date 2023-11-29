@@ -9,6 +9,8 @@ import java.util.List;
 public record OnChainEvent(
         @JsonProperty("eventType") String eventType,
         @JsonProperty("iss") String organizationId,
+        @JsonProperty("entityId") String entityId,
+        @JsonProperty("previousEntityHash") String previousEntityHash,
         @JsonProperty("dataLocation") String dataLocation,
         @JsonProperty("relevantMetadata") List<String> metadata
 ) {

@@ -1,9 +1,11 @@
 package es.in2.blockchainconnector.utils;
 
+import es.in2.blockchainconnector.exception.BrokerNotificationParserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -86,5 +88,7 @@ public class Utils {
         // Wait for the response and return the body
         return response.thenApply(HttpResponse::body).join();
     }
+
+
 
 }
