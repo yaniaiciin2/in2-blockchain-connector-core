@@ -70,7 +70,7 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
                             .transactionId(processId)
                             .createdAt(Timestamp.from(Instant.now()))
                             .dataLocation(onChainEvent.dataLocation())
-                            .entityId(Utils.extractEntityId(onChainEvent.dataLocation()))
+                            .entityId(extractEntityId(onChainEvent.dataLocation()))
                             .entityHash(extractHlValue(onChainEvent.dataLocation()))
                             .status(TransactionStatus.PUBLISHED)
                             .trader(TransactionTrader.PRODUCER)
@@ -99,6 +99,16 @@ public class BlockchainEventPublicationServiceImpl implements BlockchainEventPub
             throw new BrokerNotificationParserException("Error while extracting hl value from datalocation");
         }
         return null;
+    }
+
+    private static String extractEntityId(String entityUrl) {
+        try {
+            URI uri = new URI(entityUrl);
+            String path = uri.getPath();
+            return path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
+        }
     }
 
 }

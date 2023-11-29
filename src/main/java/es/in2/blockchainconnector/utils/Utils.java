@@ -89,14 +89,6 @@ public class Utils {
         return response.thenApply(HttpResponse::body).join();
     }
 
-    public static String extractEntityId(String entityUrl) {
-        try {
-            URI uri = new URI(entityUrl);
-            String path = uri.getPath();
-            return path.substring(path.lastIndexOf('/') + 1);
-        } catch (URISyntaxException e) {
-            throw new BrokerNotificationParserException("Error while extracting entityId from datalocation");
-        }
-    }
+
 
 }
